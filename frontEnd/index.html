@@ -8,63 +8,116 @@
   </head>
   <body>
     <header>
-      <h1>Pam's Shared Expenses App</h1>
+      <h1>Shared Expenses</h1>
       <nav>
         <a href="grand-totals.html">View Totals</a>
-        <button id="logout-btn">Logout</button>
+        <button id="logout-btn" style="display: none">Logout</button>
       </nav>
     </header>
     <main class="container">
-      <div class="form-container">
-        <h2>Add New Expense</h2>
-        <form id="expenseForm">
-          <select id="name-select"></select>
-          <input
-            type="text"
-            id="new-name"
-            placeholder="New Business Name"
-            style="display: none"
-          />
-          <input
-            type="number"
-            id="amount"
-            placeholder="Amount"
-            step="0.01"
-            required
-          />
-          <select id="type">
-            <option value="expense">Expense</option>
-            <option value="deposit">Deposit</option>
-          </select>
-          <select id="category" required>
-            <option value="">Select Category</option>
-          </select>
-          <input type="date" id="date" required />
-          <input
-            type="text"
-            id="description"
-            placeholder="Description (optional)"
-          />
-          <button type="submit">Add</button>
-        </form>
+      <div class="button-container">
+        <button id="add-expense-btn">Add Expense</button>
+        <button id="add-deposit-btn">Add Deposit</button>
+        <button id="add-category-btn">Add Category</button>
       </div>
-      <div class="category-container">
-        <h2>Add a New Category</h2>
-        <form id="category-form">
-          <input
-            type="text"
-            id="new-category-name"
-            placeholder="New Category"
-            required
-          />
-          <button type="submit">Add Category</button>
-        </form>
-        <ul id="category-list"></ul>
-      </div>
-    </main>
 
-    <div class="container">
-      <div class="table-container">
+      <div id="expense-modal" class="modal">
+        <div class="modal-content">
+          <span class="close-btn">&times;</span>
+          <h2>Add New Expense</h2>
+          <form id="expenseForm">
+            <select id="name-select"></select>
+            <input
+              type="text"
+              id="new-name"
+              placeholder="New Business Name"
+              style="display: none"
+            />
+            <input
+              type="number"
+              id="amount"
+              placeholder="Amount"
+              step="0.01"
+              required
+            />
+            <select id="category" required>
+              <option value="">Select Category</option>
+            </select>
+            <input type="date" id="date" required />
+            <input
+              type="text"
+              id="description"
+              placeholder="Description (optional)"
+            />
+            <button type="submit">Add</button>
+          </form>
+        </div>
+      </div>
+
+      <div id="deposit-modal" class="modal">
+        <div class="modal-content">
+          <span class="close-btn">&times;</span>
+          <h2>Add Deposit</h2>
+          <form id="deposit-form">
+            <input
+              type="number"
+              id="deposit-amount"
+              placeholder="Amount"
+              step="0.01"
+              required
+            />
+            <input type="date" id="deposit-date" required />
+            <textarea
+              id="deposit-description"
+              placeholder="Description"
+            ></textarea>
+            <button type="submit">Add Deposit</button>
+          </form>
+        </div>
+      </div>
+
+      <div id="category-modal" class="modal">
+        <div class="modal-content">
+          <span class="close-btn">&times;</span>
+          <h2>Add New Category</h2>
+          <form id="category-form">
+            <input
+              type="text"
+              id="new-category-name"
+              placeholder="New Category"
+              required
+            />
+            <button type="submit">Add Category</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="toggle-container">
+        <label class="switch">
+          <input type="checkbox" id="toggle-entries" />
+          <span class="slider round"></span>
+        </label>
+        <span>Show All Entries</span>
+      </div>
+
+      <div id="entries-table-container">
+        <h2>All Entries</h2>
+        <table id="entries-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Amount</th>
+              <th>Type</th>
+              <th>Category</th>
+              <th>Date</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div id="search-container">
         <h2>Search and Filter</h2>
         <form id="search-form">
           <select id="search-name-select" class="search-select"></select>
@@ -72,56 +125,32 @@
           <input type="date" id="search-start-date" />
           <input type="date" id="search-end-date" />
           <select id="search-category"></select>
+          <select id="search-type">
+            <option value="">All Types</option>
+            <option value="expense">Expense</option>
+            <option value="deposit">Deposit</option>
+          </select>
           <button type="submit">Search</button>
         </form>
       </div>
-    </div>
 
-    <div class="container">
-      <div class="table-container">
-        <h2>
-          All Entries
-          <label class="switch">
-            <input type="checkbox" id="toggle-entries" />
-            <span class="slider"></span>
-          </label>
-        </h2>
-        <div id="entries-table-container">
-          <table id="entriesTable" class="main-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Amount</th>
-                <th>Type</th>
-                <th>Description</th>
-                <th>Category</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div class="container" id="search-results-container" style="display: none">
-      <div class="table-container">
+      <div id="search-results-container">
         <h2>Search Results</h2>
-        <table id="search-results-table" class="main-table">
+        <table id="search-results-table">
           <thead>
             <tr>
               <th>Name</th>
               <th>Amount</th>
               <th>Type</th>
-              <th>Description</th>
               <th>Category</th>
               <th>Date</th>
+              <th>Description</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
-    </div>
+    </main>
 
     <script src="script.js"></script>
   </body>
