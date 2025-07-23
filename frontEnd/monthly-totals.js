@@ -116,11 +116,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Close modal
     closeBtn.onclick = function () {
-      modal.style.display = "none";
+      modal.classList.remove("show");
     };
     window.onclick = function (event) {
       if (event.target == modal) {
-        modal.style.display = "none";
+        modal.classList.remove("show");
       }
     };
 
@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       }).then(() => {
-        modal.style.display = "none";
+        modal.classList.remove("show");
         const currentMonth = monthDetailsTitle.textContent.replace(
           "Details for ",
           ""
@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
               });
             });
 
-          modal.style.display = "block";
+          modal.classList.add("show");
         });
     }
 
