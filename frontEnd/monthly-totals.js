@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <td>${tx.amount.toFixed(2)}</td>
             <td>${tx.type}</td>
             <td>${tx.description}</td>
-            <td>${tx.categoryName || "Uncategorized"}</td>
+            <td>${tx.categoryname || "Uncategorized"}</td>
             <td>${new Date(tx.date).toLocaleDateString()}</td>
             <td>
               <button class="edit-btn" data-id="${tx.id}">Edit</button>

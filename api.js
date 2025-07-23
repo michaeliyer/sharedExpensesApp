@@ -43,21 +43,64 @@ router.get("/categories", async (req, res) => {
   }
 });
 
+router.get("/names", async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT DISTINCT name FROM expenses ORDER BY name`
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 router.get("/entries", async (req, res) => {
   try {
-    const { rows } = await pool.query(`
+    let query = `
       SELECT
         e.id,
         e.name,
         e.amount,
         e.type,
         e.description,
-        c.name as categoryName,
+        COALESCE(c.name, 'Uncategorized') as categoryname,
         e.date
       FROM expenses e
       LEFT JOIN categories c ON e.category_id = c.id
-      ORDER BY e.date DESC
-    `);
+    `;
+    const whereClauses = [];
+    const queryParams = [];
+
+    if (req.query.name) {
+      whereClauses.push(`e.name ILIKE $${queryParams.length + 1}`);
+      queryParams.push(`%${req.query.name}%`);
+    }
+    if (req.query.month) {
+      whereClauses.push(
+        `TO_CHAR(e.date, 'YYYY-MM') = $${queryParams.length + 1}`
+      );
+      queryParams.push(req.query.month);
+    }
+    if (req.query.startDate && req.query.endDate) {
+      whereClauses.push(
+        `e.date BETWEEN $${queryParams.length + 1} AND $${
+          queryParams.length + 2
+        }`
+      );
+      queryParams.push(req.query.startDate, req.query.endDate);
+    }
+    if (req.query.category_id) {
+      whereClauses.push(`e.category_id = $${queryParams.length + 1}`);
+      queryParams.push(req.query.category_id);
+    }
+
+    if (whereClauses.length > 0) {
+      query += ` WHERE ${whereClauses.join(" AND ")}`;
+    }
+
+    query += ` ORDER BY e.date DESC`;
+
+    const { rows } = await pool.query(query, queryParams);
     res.json(rows);
   } catch (err) {
     res.status(500).send(err.message);
@@ -79,7 +122,7 @@ router.get("/grand-totals", async (req, res) => {
   try {
     const { rows } = await pool.query(`
       SELECT
-        c.name as categoryName,
+        COALESCE(c.name, 'Uncategorized') as categoryName,
         COALESCE(SUM(CASE WHEN e.type = 'expense' THEN e.amount ELSE 0 END), 0) AS totalExpenses,
         COALESCE(SUM(CASE WHEN e.type = 'deposit' THEN e.amount ELSE 0 END), 0) AS totalDeposits
       FROM categories c
@@ -127,7 +170,7 @@ router.get("/transactions/:month", async (req, res) => {
         e.amount,
         e.type,
         e.description,
-        c.name as categoryName,
+        COALESCE(c.name, 'Uncategorized') as categoryName,
         e.date
       FROM expenses e
       LEFT JOIN categories c ON e.category_id = c.id

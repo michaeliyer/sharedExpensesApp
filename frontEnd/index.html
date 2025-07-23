@@ -16,9 +16,15 @@
     </header>
     <main class="container">
       <div class="form-container">
-        <h1>All Expenses</h1>
+        <h2>Add New Expense</h2>
         <form id="expenseForm">
-          <input type="text" id="name" placeholder="Business Name" required />
+          <select id="name-select"></select>
+          <input
+            type="text"
+            id="new-name"
+            placeholder="New Business Name"
+            style="display: none"
+          />
           <input
             type="number"
             id="amount"
@@ -41,24 +47,67 @@
           />
           <button type="submit">Add</button>
         </form>
+      </div>
+      <div class="category-container">
+        <h2>Add a New Category</h2>
+        <form id="category-form">
+          <input
+            type="text"
+            id="new-category-name"
+            placeholder="New Category"
+            required
+          />
+          <button type="submit">Add Category</button>
+        </form>
+        <ul id="category-list"></ul>
+      </div>
+    </main>
 
-        <div id="add-category-section">
-          <h2>Add a New Category</h2>
-          <form id="category-form">
-            <input
-              type="text"
-              id="new-category-name"
-              placeholder="Category Name"
-              required
-            />
-            <button type="submit">Add Category</button>
-          </form>
+    <div class="container">
+      <div class="table-container">
+        <h2>Search and Filter</h2>
+        <form id="search-form">
+          <select id="search-name-select" class="search-select"></select>
+          <input type="month" id="search-month" />
+          <input type="date" id="search-start-date" />
+          <input type="date" id="search-end-date" />
+          <select id="search-category"></select>
+          <button type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="table-container">
+        <h2>
+          All Entries
+          <label class="switch">
+            <input type="checkbox" id="toggle-entries" />
+            <span class="slider"></span>
+          </label>
+        </h2>
+        <div id="entries-table-container">
+          <table id="entriesTable" class="main-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Amount</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
+    </div>
 
+    <div class="container" id="search-results-container" style="display: none">
       <div class="table-container">
-        <h2>All Entries</h2>
-        <table id="entriesTable" class="main-table">
+        <h2>Search Results</h2>
+        <table id="search-results-table" class="main-table">
           <thead>
             <tr>
               <th>Name</th>
@@ -72,7 +121,7 @@
           <tbody></tbody>
         </table>
       </div>
-    </main>
+    </div>
 
     <script src="script.js"></script>
   </body>

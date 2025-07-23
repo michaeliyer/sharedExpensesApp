@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
           totalNet += net;
 
           const categoryDiv = document.createElement("div");
-          categoryDiv.classList.add("category-total");
+          categoryDiv.classList.add("category-item");
           categoryDiv.innerHTML = `
                         <h4>${category.categoryname || "Uncategorized"}</h4>
                         <p>Expenses: $${category.totalexpenses.toFixed(2)}</p>
