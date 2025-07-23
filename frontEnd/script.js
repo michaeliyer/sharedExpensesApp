@@ -235,8 +235,21 @@ document.addEventListener("DOMContentLoaded", () => {
               fetchWithAuth(`/api/category/${category.id}`, {
                 method: "DELETE",
               })
-                .then((response) => response.json())
-                .then(() => loadCategories());
+                .then((response) => {
+                  if (!response.ok) {
+                    return response.json().then((data) => {
+                      throw new Error(
+                        data.error ||
+                          "Failed to delete category. Please clear data."
+                      );
+                    });
+                  }
+                  return response.json();
+                })
+                .then(() => loadCategories())
+                .catch((error) => {
+                  alert(error.message);
+                });
             }
           };
           li.appendChild(delBtn);
