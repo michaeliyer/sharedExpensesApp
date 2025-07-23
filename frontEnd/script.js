@@ -36,22 +36,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeBtns = document.querySelectorAll(".close-btn");
 
   addExpenseBtn.addEventListener("click", () => {
-    expenseModal.style.display = "block";
+    expenseModal.classList.add("show");
   });
 
   addCategoryBtn.addEventListener("click", () => {
-    categoryModal.style.display = "block";
+    categoryModal.classList.add("show");
   });
 
   addDepositBtn.addEventListener("click", () => {
-    depositModal.style.display = "block";
+    depositModal.classList.add("show");
   });
 
   closeBtns.forEach((btn) => {
     btn.addEventListener("click", () => {
-      expenseModal.style.display = "none";
-      categoryModal.style.display = "none";
-      depositModal.style.display = "none";
+      expenseModal.classList.remove("show");
+      categoryModal.classList.remove("show");
+      depositModal.classList.remove("show");
     });
   });
 
@@ -61,9 +61,9 @@ document.addEventListener("DOMContentLoaded", () => {
       event.target == categoryModal ||
       event.target == depositModal
     ) {
-      expenseModal.style.display = "none";
-      categoryModal.style.display = "none";
-      depositModal.style.display = "none";
+      expenseModal.classList.remove("show");
+      categoryModal.classList.remove("show");
+      depositModal.classList.remove("show");
     }
   });
 
@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
         loadEntries();
         loadNames();
         expenseForm.reset();
-        expenseModal.style.display = "none";
+        expenseModal.classList.remove("show");
       });
   });
 
@@ -191,7 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(() => {
         loadEntries();
         document.getElementById("deposit-form").reset();
-        depositModal.style.display = "none";
+        depositModal.classList.remove("show");
       });
   });
 
@@ -231,7 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then(() => {
         loadCategories();
         document.getElementById("category-form").reset();
-        categoryModal.style.display = "none";
+        categoryModal.classList.remove("show");
       });
   });
 

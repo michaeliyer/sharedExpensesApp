@@ -196,6 +196,10 @@ input:checked + .slider:before {
   display: none !important;
 }
 
+.modal.show {
+  display: block !important;
+}
+
 nav a {
   display: inline-block;
   padding: 12px 20px;
