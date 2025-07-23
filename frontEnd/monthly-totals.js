@@ -12,9 +12,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeBtn = document.getElementsByClassName("close-btn")[0];
   const editForm = document.getElementById("edit-form");
   const editCategorySelect = document.getElementById("edit-category");
+  const logoutBtn = document.getElementById("logout-btn");
+
+  logoutBtn.addEventListener("click", () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login.html";
+  });
+
+  const fetchWithAuth = (url, options = {}) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found for authenticated fetch.");
+      return Promise.reject(new Error("Unauthorized"));
+    }
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+    return fetch(url, { ...options, headers });
+  };
 
   // Fetch and display list of months
-  fetch("/totals")
+  fetchWithAuth("/api/totals")
     .then((response) => response.json())
     .then((months) => {
       months.forEach((monthObj) => {
@@ -34,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ytdTotalsContainer.innerHTML = "";
 
     // Fetch monthly details
-    fetch(`/monthly-totals/${month}`)
+    fetchWithAuth(`/api/monthly-totals/${month}`)
       .then((response) => response.json())
       .then((data) => {
         data.forEach((category) => {
@@ -53,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
     // Fetch and display transactions
-    fetch(`/transactions/${month}`)
+    fetchWithAuth(`/api/transactions/${month}`)
       .then((response) => response.json())
       .then((data) => {
         data.forEach((tx) => {
@@ -64,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <td>${tx.type}</td>
             <td>${tx.description}</td>
             <td>${tx.categoryName || "Uncategorized"}</td>
-            <td>${tx.date}</td>
+            <td>${new Date(tx.date).toLocaleDateString()}</td>
             <td>
               <button class="edit-btn" data-id="${tx.id}">Edit</button>
               <button class="delete-btn" data-id="${tx.id}">Delete</button>
@@ -78,7 +97,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.target.classList.contains("delete-btn")) {
         const id = e.target.dataset.id;
         if (confirm("Are you sure you want to delete this transaction?")) {
-          fetch(`/delete-transaction/${id}`, { method: "DELETE" }).then(() => {
+          fetchWithAuth(`/api/delete-transaction/${id}`, {
+            method: "DELETE",
+          }).then(() => {
             const currentMonth = monthDetailsTitle.textContent.replace(
               "Details for ",
               ""
@@ -116,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
         date: document.getElementById("edit-date").value,
       };
 
-      fetch(`/update-transaction/${id}`, {
+      fetchWithAuth(`/api/update-transaction/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -132,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function openEditModal(id) {
       // Fetch transaction details and populate form
-      fetch(`/transaction/${id}`) // Need to create this endpoint
+      fetchWithAuth(`/api/transaction/${id}`) // Need to create this endpoint
         .then((response) => response.json())
         .then((tx) => {
           document.getElementById("edit-id").value = tx.id;
@@ -140,10 +161,12 @@ document.addEventListener("DOMContentLoaded", () => {
           document.getElementById("edit-amount").value = tx.amount;
           document.getElementById("edit-type").value = tx.type;
           document.getElementById("edit-description").value = tx.description;
-          document.getElementById("edit-date").value = tx.date;
+          document.getElementById("edit-date").value = new Date(tx.date)
+            .toISOString()
+            .split("T")[0];
 
           // Populate category dropdown
-          fetch("/categories")
+          fetchWithAuth("/api/categories")
             .then((response) => response.json())
             .then((categories) => {
               editCategorySelect.innerHTML = "";
@@ -163,14 +186,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Fetch YTD totals
-    fetch(`/ytd-totals/${month}`)
-      .then((response) => response.json())
+    fetchWithAuth(`/api/ytd-totals/${month}`)
+      .then((response) => {
+        if (!response.ok) {
+          window.location.href = "/login.html";
+        }
+        return response.json();
+      })
       .then((data) => {
         const ytdDiv = document.createElement("div");
         ytdDiv.innerHTML = `
-          <p>YTD Expenses: $${data.ytdExpenses.toFixed(2)}</p>
-          <p>YTD Deposits: $${data.ytdDeposits.toFixed(2)}</p>
-          <p>YTD Net: $${(data.ytdExpenses - data.ytdDeposits).toFixed(2)}</p>
+          <p>YTD Expenses: $${(data.ytdexpenses || 0).toFixed(2)}</p>
+          <p>YTD Deposits: $${(data.ytddeposits || 0).toFixed(2)}</p>
+          <p>YTD Net: $${(
+            (data.ytdexpenses || 0) - (data.ytddeposits || 0)
+          ).toFixed(2)}</p>
         `;
         ytdTotalsContainer.appendChild(ytdDiv);
       });
