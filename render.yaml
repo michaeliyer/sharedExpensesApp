@@ -1,0 +1,38 @@
+services:
+  # Web service for the Node.js application
+  - type: web
+    name: shared-expenses-app
+    # Use the 'node' runtime
+    runtime: node
+    # Use Render's free instance type
+    plan: free
+    # Commands to build and start the application
+    buildCommand: "npm install"
+    startCommand: "node server.js"
+    # Environment variables required by the application
+    envVars:
+      # Set the Node.js version (based on your local environment)
+      - key: NODE_VERSION
+        value: "18.20.5"
+      # Link to the database service defined below
+      - key: DATABASE_URL
+        fromDatabase:
+          name: expenses-db
+          property: connectionString
+      # Generate a secure, random value for the SECRET_KEY on first deploy
+      - key: SECRET_KEY
+        generateValue: true
+      # These values are secrets and should be set in the Render dashboard.
+      # 'sync: false' prevents them from being stored in your repository.
+      - key: MASTER_USERNAME
+        sync: false
+      - key: MASTER_PASSWORD
+        sync: false
+
+  # PostgreSQL database service
+  - type: db
+    name: expenses-db
+    # Name for the database instance
+    databaseName: shared_expenses
+    # Use Render's free database plan
+    plan: free
