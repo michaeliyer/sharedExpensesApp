@@ -267,7 +267,10 @@ router.delete("/category/:id", async (req, res) => {
     if (expenses.rows.length > 0) {
       return res
         .status(400)
-        .json({ error: "Category is not empty and cannot be deleted." });
+        .json({
+          error:
+            "Category is not empty and cannot be deleted. Please Clear Data!",
+        });
     }
     await pool.query(`DELETE FROM categories WHERE id = $1`, [id]);
     res.json({ success: true });

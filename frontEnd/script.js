@@ -239,8 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   if (!response.ok) {
                     return response.json().then((data) => {
                       throw new Error(
-                        data.error ||
-                          "Failed to delete category. Please clear data."
+                        data.error || "Failed to delete category."
                       );
                     });
                   }
