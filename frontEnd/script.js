@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const date = document.getElementById("date").value;
     const description = document.getElementById("description").value;
 
-    fetchWithAuth("/api/entries", {
+    fetchWithAuth("/api/add", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const date = document.getElementById("deposit-date").value;
     const description = document.getElementById("deposit-description").value;
 
-    fetchWithAuth("/api/entries", {
+    fetchWithAuth("/api/add", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
