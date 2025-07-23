@@ -193,5 +193,5 @@ input:checked + .slider:before {
 }
 
 .modal {
-  display: none;
+  display: none !important;
 }
