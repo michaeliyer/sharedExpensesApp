@@ -195,3 +195,20 @@ input:checked + .slider:before {
 .modal {
   display: none !important;
 }
+
+nav a {
+  display: inline-block;
+  padding: 12px 20px;
+  background-color: #0a9396;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  text-decoration: none;
+  margin-right: 10px;
+  transition: background-color 0.3s ease;
+}
+nav a:hover {
+  background-color: #005f73;
+}
