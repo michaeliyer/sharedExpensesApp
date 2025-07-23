@@ -30,7 +30,7 @@ services:
         sync: false
 
   # PostgreSQL database service
-  - type: db
+  - type: psql
     name: expenses-db
     # Name for the database instance
     databaseName: shared_expenses
