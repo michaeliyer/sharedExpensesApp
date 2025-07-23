@@ -3,6 +3,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!token) {
     window.location.href = "login.html";
   }
+  document.getElementById("add-expense-btn").style.display = "inline-block";
+  document.getElementById("add-deposit-btn").style.display = "inline-block";
 
   const expenseForm = document.getElementById("expenseForm");
   const nameSelect = document.getElementById("name-select");
