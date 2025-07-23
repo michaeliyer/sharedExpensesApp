@@ -215,6 +215,33 @@ document.addEventListener("DOMContentLoaded", () => {
           searchOption.textContent = category.name;
           searchCategorySelect.appendChild(searchOption);
         });
+        // Render category list with delete buttons
+        let categoryList = document.getElementById("category-list");
+        if (!categoryList) {
+          categoryList = document.createElement("ul");
+          categoryList.id = "category-list";
+          categoryList.style.marginTop = "20px";
+          document.querySelector(".container").appendChild(categoryList);
+        }
+        categoryList.innerHTML = "";
+        categories.forEach((category) => {
+          const li = document.createElement("li");
+          li.textContent = category.name;
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "Delete";
+          delBtn.className = "delete-category-btn";
+          delBtn.onclick = () => {
+            if (confirm(`Delete category '${category.name}'?`)) {
+              fetchWithAuth(`/api/category/${category.id}`, {
+                method: "DELETE",
+              })
+                .then((response) => response.json())
+                .then(() => loadCategories());
+            }
+          };
+          li.appendChild(delBtn);
+          categoryList.appendChild(li);
+        });
       });
   }
   loadCategories();

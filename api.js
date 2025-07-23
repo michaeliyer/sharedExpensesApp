@@ -34,6 +34,19 @@ router.post("/add-category", async (req, res) => {
   }
 });
 
+router.post("/categories", async (req, res) => {
+  const { name } = req.body;
+  try {
+    const result = await pool.query(
+      `INSERT INTO categories (name) VALUES ($1) ON CONFLICT (name) DO NOTHING RETURNING id`,
+      [name]
+    );
+    res.json({ success: true, id: result.rows[0]?.id });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 router.get("/categories", async (req, res) => {
   try {
     const { rows } = await pool.query(`SELECT * FROM categories ORDER BY name`);
