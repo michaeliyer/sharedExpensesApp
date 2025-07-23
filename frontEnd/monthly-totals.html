@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monthly Totals</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Monthly Totals</h1>
+      <nav>
+        <a href="index.html">Enter Expenses</a>
+        <a href="grand-totals.html">Grand Totals</a>
+      </nav>
+    </header>
+    <main class="container">
+      <div class="card">
+        <section id="month-list">
+          <h2>Select a Month</h2>
+          <div id="month-list-container"></div>
+        </section>
+      </div>
+      <div class="card">
+        <section id="month-details">
+          <h2 id="month-details-title"></h2>
+          <div id="month-details-container"></div>
+        </section>
+      </div>
+      <div class="card">
+        <section id="transaction-list">
+          <h3>Transactions</h3>
+          <table id="transaction-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Amount</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </section>
+      </div>
+      <div class="card">
+        <section id="ytd-totals">
+          <h3>Year-to-Date Totals</h3>
+          <div id="ytd-totals-container"></div>
+        </section>
+      </div>
+
+      <!-- Edit Modal -->
+      <div id="edit-modal" class="modal">
+        <div class="modal-content">
+          <span class="close-btn">&times;</span>
+          <h2>Edit Transaction</h2>
+          <form id="edit-form">
+            <input type="hidden" id="edit-id" />
+            <input
+              type="text"
+              id="edit-name"
+              placeholder="Person's Name"
+              required
+            />
+            <input
+              type="number"
+              id="edit-amount"
+              placeholder="Amount"
+              step="0.01"
+              required
+            />
+            <select id="edit-type">
+              <option value="expense">Expense</option>
+              <option value="deposit">Deposit</option>
+            </select>
+            <select id="edit-category" required></select>
+            <input
+              type="text"
+              id="edit-description"
+              placeholder="Description"
+            />
+            <input type="date" id="edit-date" required />
+            <button type="submit">Save Changes</button>
+          </form>
+        </div>
+      </div>
+    </main>
+    <script src="monthly-totals.js"></script>
+  </body>
+</html>
