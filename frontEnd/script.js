@@ -112,7 +112,8 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((response) => response.json())
       .then((names) => {
         nameSelect.innerHTML = '<option value="">Select Name</option>';
-        searchNameSelect.innerHTML = '<option value="">Search by Name</option>';
+        searchNameSelect.innerHTML =
+          '<option value="Search by Name">Search by Name</option>';
         names.forEach((name) => {
           const option = document.createElement("option");
           option.value = name.name;
@@ -127,6 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
         nameSelect.innerHTML += '<option value="new">Add New Name</option>';
       });
   }
+  window.loadNames = loadNames;
   loadNames();
 
   nameSelect.addEventListener("change", () => {

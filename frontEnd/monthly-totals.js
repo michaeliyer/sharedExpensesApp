@@ -105,6 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
               ""
             );
             displayMonthDetails(currentMonth);
+            if (window.loadNames) window.loadNames();
           });
         }
       }
