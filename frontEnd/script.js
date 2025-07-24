@@ -115,15 +115,17 @@ document.addEventListener("DOMContentLoaded", () => {
         searchNameSelect.innerHTML =
           '<option value="Search by Name">Search by Name</option>';
         names.forEach((name) => {
-          const option = document.createElement("option");
-          option.value = name.name;
-          option.textContent = name.name;
-          nameSelect.appendChild(option);
+          if (name.name !== "Deposit") {
+            const option = document.createElement("option");
+            option.value = name.name;
+            option.textContent = name.name;
+            nameSelect.appendChild(option);
 
-          const searchOption = document.createElement("option");
-          searchOption.value = name.name;
-          searchOption.textContent = name.name;
-          searchNameSelect.appendChild(searchOption);
+            const searchOption = document.createElement("option");
+            searchOption.value = name.name;
+            searchOption.textContent = name.name;
+            searchNameSelect.appendChild(searchOption);
+          }
         });
         nameSelect.innerHTML += '<option value="new">Add New Name</option>';
       });
