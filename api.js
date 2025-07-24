@@ -288,4 +288,22 @@ router.delete("/category/:id", async (req, res) => {
   }
 });
 
+router.get("/entries-by-category/:categoryName", async (req, res) => {
+  const { categoryName } = req.params;
+  try {
+    let query, params;
+    if (categoryName === "Uncategorized") {
+      query = `SELECT e.* FROM expenses e WHERE e.category_id IS NULL ORDER BY e.date DESC`;
+      params = [];
+    } else {
+      query = `SELECT e.* FROM expenses e JOIN categories c ON e.category_id = c.id WHERE c.name = $1 ORDER BY e.date DESC`;
+      params = [categoryName];
+    }
+    const { rows } = await pool.query(query, params);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 module.exports = router;
