@@ -214,8 +214,9 @@ document.addEventListener("DOMContentLoaded", () => {
           option.textContent = category.name;
           categorySelect.appendChild(option);
 
+          // For search, use category name as value for easier backend filtering
           const searchOption = document.createElement("option");
-          searchOption.value = category.id;
+          searchOption.value = category.name;
           searchOption.textContent = category.name;
           searchCategorySelect.appendChild(searchOption);
         });
@@ -242,6 +243,41 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   });
 
+  // Add a reset button to the search form
+  const searchFormEl = document.getElementById("search-form");
+  let resetBtn = document.getElementById("reset-search-btn");
+  if (!resetBtn) {
+    resetBtn = document.createElement("button");
+    resetBtn.type = "button";
+    resetBtn.id = "reset-search-btn";
+    resetBtn.textContent = "Reset All Fields";
+    resetBtn.style.marginLeft = "10px";
+    searchFormEl.appendChild(resetBtn);
+  }
+  resetBtn.onclick = () => {
+    searchNameSelect.value = "";
+    document.getElementById("search-month").value = "";
+    document.getElementById("search-start-date").value = "";
+    document.getElementById("search-end-date").value = "";
+    searchCategorySelect.value = "";
+    document.getElementById("search-type").value = "";
+    searchResultsTable.innerHTML = "";
+    document.getElementById("search-results-label").textContent = "";
+  };
+
+  // Add a label above results to show active filters
+  let resultsLabel = document.getElementById("search-results-label");
+  if (!resultsLabel) {
+    resultsLabel = document.createElement("div");
+    resultsLabel.id = "search-results-label";
+    resultsLabel.style.margin = "10px 0 10px 0";
+    resultsLabel.style.fontWeight = "bold";
+    searchResultsContainer.insertBefore(
+      resultsLabel,
+      searchResultsContainer.firstChild.nextSibling
+    );
+  }
+
   searchForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const query = new URLSearchParams();
@@ -249,7 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const month = document.getElementById("search-month").value;
     const startDate = document.getElementById("search-start-date").value;
     const endDate = document.getElementById("search-end-date").value;
-    const categoryId = searchCategorySelect.value;
+    const categoryName = searchCategorySelect.value;
     const type = document.getElementById("search-type").value;
 
     // Only add name if a real name is selected
@@ -264,8 +300,35 @@ document.addEventListener("DOMContentLoaded", () => {
       query.append("endDate", endDate);
     }
 
-    if (categoryId) query.append("category_id", categoryId);
+    // For search, send category name as filter
+    if (categoryName) query.append("categoryname", categoryName);
     if (type) query.append("type", type);
+
+    // Build filter label
+    let label = "Filters: ";
+    let any = false;
+    if (name && name !== "" && name !== "Search by Name") {
+      label += `Name: ${name} `;
+      any = true;
+    }
+    if (month) {
+      label += `Month: ${month} `;
+      any = true;
+    }
+    if (startDate && endDate) {
+      label += `Range: ${startDate} to ${endDate} `;
+      any = true;
+    }
+    if (categoryName) {
+      label += `Category: ${categoryName} `;
+      any = true;
+    }
+    if (type) {
+      label += `Type: ${type} `;
+      any = true;
+    }
+    if (!any) label = "Filters: None";
+    resultsLabel.textContent = label;
 
     fetchWithAuth(`/api/entries?${query.toString()}`)
       .then((response) => response.json())

@@ -106,6 +106,12 @@ router.get("/entries", async (req, res) => {
       whereClauses.push(`e.category_id = $${queryParams.length + 1}`);
       queryParams.push(req.query.category_id);
     }
+    if (req.query.categoryname) {
+      whereClauses.push(
+        `COALESCE(c.name, 'Uncategorized') ILIKE $${queryParams.length + 1}`
+      );
+      queryParams.push(req.query.categoryname);
+    }
     if (req.query.type) {
       whereClauses.push(`e.type = $${queryParams.length + 1}`);
       queryParams.push(req.query.type);
