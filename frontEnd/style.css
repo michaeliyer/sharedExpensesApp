@@ -303,3 +303,59 @@ nav a:hover {
 .category-expand-btn:hover {
   background-color: #005f73;
 }
+
+/* Modal Category List Styling */
+#modal-category-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.modal-category-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0 8px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+.modal-category-name {
+  flex: 1;
+  font-size: 1em;
+  color: #333;
+}
+.modal-category-edit-input {
+  flex: 1;
+  font-size: 1em;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+.modal-category-btn {
+  margin-left: 4px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.95em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.modal-category-edit {
+  background: #2196f3;
+  color: #fff;
+}
+.modal-category-edit:hover {
+  background: #1769aa;
+}
+.modal-category-save {
+  background: #43aa8b;
+  color: #fff;
+}
+.modal-category-save:hover {
+  background: #2d6a4f;
+}
+.modal-category-cancel {
+  background: #adb5bd;
+  color: #fff;
+}
+.modal-category-cancel:hover {
+  background: #495057;
+}

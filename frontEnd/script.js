@@ -217,45 +217,9 @@ document.addEventListener("DOMContentLoaded", () => {
           searchOption.textContent = category.name;
           searchCategorySelect.appendChild(searchOption);
         });
-        // Render category list with delete buttons
-        let categoryList = document.getElementById("category-list");
-        if (!categoryList) {
-          categoryList = document.createElement("ul");
-          categoryList.id = "category-list";
-          categoryList.style.marginTop = "20px";
-          document.querySelector(".container").appendChild(categoryList);
-        }
-        categoryList.innerHTML = "";
-        categories.forEach((category) => {
-          const li = document.createElement("li");
-          li.textContent = category.name;
-          const delBtn = document.createElement("button");
-          delBtn.textContent = "Delete";
-          delBtn.className = "delete-category-btn";
-          delBtn.onclick = () => {
-            if (confirm(`Delete category '${category.name}'?`)) {
-              fetchWithAuth(`/api/category/${category.id}`, {
-                method: "DELETE",
-              })
-                .then((response) => {
-                  if (!response.ok) {
-                    return response.json().then((data) => {
-                      throw new Error(
-                        data.error || "Failed to delete category."
-                      );
-                    });
-                  }
-                  return response.json();
-                })
-                .then(() => loadCategories())
-                .catch((error) => {
-                  alert(error.message);
-                });
-            }
-          };
-          li.appendChild(delBtn);
-          categoryList.appendChild(li);
-        });
+        // Remove old category list from main container if present
+        const oldCategoryList = document.getElementById("category-list");
+        if (oldCategoryList) oldCategoryList.remove();
       });
   }
   loadCategories();
@@ -310,5 +274,118 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         searchResultsContainer.style.display = "block";
       });
+  });
+
+  // --- Add/Delete Categories Modal Logic ---
+  const toggleCategoryListBtn = document.getElementById("toggle-category-list");
+  const modalCategoryList = document.getElementById("modal-category-list");
+  let modalCategories = [];
+  let categoryListVisible = false;
+
+  function renderModalCategoryList() {
+    modalCategoryList.innerHTML = "";
+    modalCategories.forEach((category) => {
+      const li = document.createElement("li");
+      li.className = "modal-category-item";
+      // State: editing or not
+      if (category.editing) {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = category.name;
+        input.className = "modal-category-edit-input";
+        li.appendChild(input);
+        // Save button
+        const saveBtn = document.createElement("button");
+        saveBtn.textContent = "Save";
+        saveBtn.className = "modal-category-btn modal-category-save";
+        saveBtn.onclick = () => {
+          const newName = input.value.trim();
+          if (!newName) return alert("Category name cannot be empty.");
+          fetchWithAuth(`/api/category/${category.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: newName }),
+          })
+            .then((response) => response.json())
+            .then(() => {
+              loadModalCategories();
+              loadCategories();
+            });
+        };
+        li.appendChild(saveBtn);
+        // Cancel button
+        const cancelBtn = document.createElement("button");
+        cancelBtn.textContent = "Cancel";
+        cancelBtn.className = "modal-category-btn modal-category-cancel";
+        cancelBtn.onclick = () => {
+          category.editing = false;
+          renderModalCategoryList();
+        };
+        li.appendChild(cancelBtn);
+      } else {
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "modal-category-name";
+        nameSpan.textContent = category.name;
+        li.appendChild(nameSpan);
+        // Edit button
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "Edit";
+        editBtn.className = "modal-category-btn modal-category-edit";
+        editBtn.onclick = () => {
+          modalCategories.forEach((c) => (c.editing = false));
+          category.editing = true;
+          renderModalCategoryList();
+        };
+        li.appendChild(editBtn);
+        // Delete button
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "Delete";
+        delBtn.className = "modal-category-btn delete-category-btn";
+        delBtn.onclick = () => {
+          if (confirm(`Delete category '${category.name}'?`)) {
+            fetchWithAuth(`/api/category/${category.id}`, {
+              method: "DELETE",
+            })
+              .then((response) => {
+                if (!response.ok) {
+                  return response.json().then((data) => {
+                    throw new Error(data.error || "Failed to delete category.");
+                  });
+                }
+                return response.json();
+              })
+              .then(() => {
+                loadModalCategories();
+                loadCategories();
+              })
+              .catch((error) => {
+                alert(error.message);
+              });
+          }
+        };
+        li.appendChild(delBtn);
+      }
+      modalCategoryList.appendChild(li);
+    });
+  }
+
+  function loadModalCategories() {
+    fetchWithAuth("/api/categories")
+      .then((response) => response.json())
+      .then((categories) => {
+        modalCategories = categories.map((cat) => ({ ...cat, editing: false }));
+        renderModalCategoryList();
+      });
+  }
+
+  toggleCategoryListBtn.addEventListener("click", () => {
+    categoryListVisible = !categoryListVisible;
+    modalCategoryList.style.display = categoryListVisible ? "block" : "none";
+    toggleCategoryListBtn.textContent = categoryListVisible
+      ? "Hide Categories"
+      : "Show/Delete Categories";
+    if (categoryListVisible) {
+      loadModalCategories();
+    }
   });
 });

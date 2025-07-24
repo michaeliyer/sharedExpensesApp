@@ -288,6 +288,20 @@ router.delete("/category/:id", async (req, res) => {
   }
 });
 
+router.put("/category/:id", async (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  try {
+    const result = await pool.query(
+      `UPDATE categories SET name = $1 WHERE id = $2 RETURNING *`,
+      [name, id]
+    );
+    res.json({ success: true, category: result.rows[0] });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 router.get("/entries-by-category/:categoryName", async (req, res) => {
   const { categoryName } = req.params;
   try {
