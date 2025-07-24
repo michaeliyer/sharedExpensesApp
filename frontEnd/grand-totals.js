@@ -64,6 +64,12 @@ document.addEventListener("DOMContentLoaded", () => {
             <h3>All Deposits</h3>
             <p>Total Deposits: $${totalDeposits.toFixed(2)}</p>
           `;
+          // Add expand button for deposits
+          const expandBtn = document.createElement("button");
+          expandBtn.className = "category-expand-btn";
+          expandBtn.textContent = "View Deposits";
+          expandBtn.onclick = () => openDepositsModal();
+          depositSection.appendChild(expandBtn);
           categoryTotalsContainer.appendChild(depositSection);
           // Update annual total
           annualTotalAmount.textContent = `$${(
@@ -132,6 +138,69 @@ document.addEventListener("DOMContentLoaded", () => {
               <td>${entry.name}</td>
               <td>$${(+entry.amount).toFixed(2)}</td>
               <td>${entry.type}</td>
+              <td>${entry.description || ""}</td>
+              <td>${new Date(entry.date).toLocaleDateString()}</td>
+            `;
+            tbody.appendChild(row);
+          });
+        }
+      });
+  }
+
+  function openDepositsModal() {
+    // Create overlay
+    const overlay = document.createElement("div");
+    overlay.className = "category-modal-overlay";
+    // Create modal box
+    const modalBox = document.createElement("div");
+    modalBox.className = "category-modal-box";
+    // Close button
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "category-modal-close";
+    closeBtn.textContent = "✕";
+    closeBtn.onclick = () => document.body.removeChild(overlay);
+    modalBox.appendChild(closeBtn);
+    // Title
+    const title = document.createElement("div");
+    title.className = "category-modal-title";
+    title.textContent = `All Deposit Entries`;
+    modalBox.appendChild(title);
+    // Table
+    const table = document.createElement("table");
+    table.className = "category-modal-table";
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Amount</th>
+          <th>Description</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    `;
+    modalBox.appendChild(table);
+    overlay.appendChild(modalBox);
+    document.body.appendChild(overlay);
+    // Fetch deposit entries
+    fetchWithAuth(`/api/all-deposits`)
+      .then((response) => response.json())
+      .then((entries) => {
+        const tbody = table.querySelector("tbody");
+        tbody.innerHTML = "";
+        if (entries.length === 0) {
+          const row = document.createElement("tr");
+          const cell = document.createElement("td");
+          cell.colSpan = 4;
+          cell.textContent = "No deposits found.";
+          row.appendChild(cell);
+          tbody.appendChild(row);
+        } else {
+          entries.forEach((entry) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${entry.name}</td>
+              <td>$${(+entry.amount).toFixed(2)}</td>
               <td>${entry.description || ""}</td>
               <td>${new Date(entry.date).toLocaleDateString()}</td>
             `;

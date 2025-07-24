@@ -306,4 +306,15 @@ router.get("/entries-by-category/:categoryName", async (req, res) => {
   }
 });
 
+router.get("/all-deposits", async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT * FROM expenses WHERE type = 'deposit' ORDER BY date DESC`
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 module.exports = router;
