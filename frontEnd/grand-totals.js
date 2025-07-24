@@ -56,27 +56,37 @@ document.addEventListener("DOMContentLoaded", () => {
           categoryDiv.appendChild(expandBtn);
           categoryTotalsContainer.appendChild(categoryDiv);
         });
+        // Render bar graph if there are categories
+        if (categoryNames.length > 0) {
+          renderCategoryBarGraph(
+            categoryNames,
+            categoryExpenses,
+            totalExpenses
+          );
+        }
       }
-      // Render bar graph
-      renderCategoryBarGraph(categoryNames, categoryExpenses, totalExpenses);
-      // Fetch and display total deposits in a dedicated section, and update annual total
+      // Always render the deposits box, even if total is zero
+      const depositSection = document.createElement("div");
+      depositSection.classList.add("category-item");
+      depositSection.innerHTML = `
+        <h3>All Deposits</h3>
+        <p id="total-deposits-amount">Total Deposits: $0.00</p>
+      `;
+      // Add expand button for deposits
+      const expandBtn = document.createElement("button");
+      expandBtn.className = "category-expand-btn";
+      expandBtn.textContent = "View Deposits";
+      expandBtn.onclick = () => openDepositsModal();
+      depositSection.appendChild(expandBtn);
+      categoryTotalsContainer.appendChild(depositSection);
+      // Fetch and update the total deposits and annual total
       fetchWithAuth("/api/total-deposits")
         .then((response) => response.json())
         .then((depositData) => {
           const totalDeposits = +depositData.totaldeposits;
-          const depositSection = document.createElement("div");
-          depositSection.classList.add("category-item");
-          depositSection.innerHTML = `
-            <h3>All Deposits</h3>
-            <p>Total Deposits: $${totalDeposits.toFixed(2)}</p>
-          `;
-          // Add expand button for deposits
-          const expandBtn = document.createElement("button");
-          expandBtn.className = "category-expand-btn";
-          expandBtn.textContent = "View Deposits";
-          expandBtn.onclick = () => openDepositsModal();
-          depositSection.appendChild(expandBtn);
-          categoryTotalsContainer.appendChild(depositSection);
+          document.getElementById(
+            "total-deposits-amount"
+          ).textContent = `Total Deposits: $${totalDeposits.toFixed(2)}`;
           // Update annual total
           annualTotalAmount.textContent = `$${(
             totalExpenses - totalDeposits
