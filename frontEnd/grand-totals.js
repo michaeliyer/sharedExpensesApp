@@ -29,11 +29,15 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .then((data) => {
       let totalExpenses = 0;
+      let categoryNames = [];
+      let categoryExpenses = [];
       if (data.length === 0) {
         annualTotalAmount.textContent = "$0.00";
       } else {
         data.forEach((category) => {
           totalExpenses += category.totalexpenses;
+          categoryNames.push(category.categoryname || "Uncategorized");
+          categoryExpenses.push(category.totalexpenses);
           const net = category.totalexpenses - category.totaldeposits;
 
           const categoryDiv = document.createElement("div");
@@ -53,6 +57,8 @@ document.addEventListener("DOMContentLoaded", () => {
           categoryTotalsContainer.appendChild(categoryDiv);
         });
       }
+      // Render bar graph
+      renderCategoryBarGraph(categoryNames, categoryExpenses, totalExpenses);
       // Fetch and display total deposits in a dedicated section, and update annual total
       fetchWithAuth("/api/total-deposits")
         .then((response) => response.json())
@@ -208,5 +214,65 @@ document.addEventListener("DOMContentLoaded", () => {
           });
         }
       });
+  }
+
+  // Chart.js bar graph logic
+  let categoryBarChart = null;
+  function renderCategoryBarGraph(names, expenses, total) {
+    const ctx = document.getElementById("category-bar-graph").getContext("2d");
+    if (categoryBarChart) {
+      categoryBarChart.destroy();
+    }
+    categoryBarChart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: names,
+        datasets: [
+          {
+            label: "Total Expenses",
+            data: expenses,
+            backgroundColor: "#0a9396",
+            borderRadius: 8,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const value = context.parsed.y;
+                const percent = total > 0 ? (value / total) * 100 : 0;
+                return ` $${value.toFixed(2)} (${percent.toFixed(1)}%)`;
+              },
+            },
+          },
+          legend: { display: false },
+          datalabels: {
+            display: true,
+            color: "#333",
+            anchor: "end",
+            align: "top",
+            formatter: function (value, context) {
+              const percent = total > 0 ? (value / total) * 100 : 0;
+              return `$${value.toFixed(2)}\n${percent.toFixed(1)}%`;
+            },
+          },
+        },
+        scales: {
+          x: {
+            title: { display: true, text: "Category" },
+            ticks: { color: "#005f73", font: { weight: "bold" } },
+          },
+          y: {
+            title: { display: true, text: "Total Expenses ($)" },
+            beginAtZero: true,
+            ticks: { color: "#005f73", font: { weight: "bold" } },
+          },
+        },
+      },
+      plugins: [],
+    });
   }
 });

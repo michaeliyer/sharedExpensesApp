@@ -19,9 +19,14 @@
     <div class="container">
       <div class="table-container">
         <h2>Annual Total: <span id="annual-total-amount"></span></h2>
+        <canvas
+          id="category-bar-graph"
+          style="max-width: 100%; margin-bottom: 32px"
+        ></canvas>
         <div id="category-totals-container"></div>
       </div>
     </div>
+    <script src="../node_modules/chart.js/dist/chart.umd.js"></script>
     <script src="grand-totals.js"></script>
   </body>
 </html>
