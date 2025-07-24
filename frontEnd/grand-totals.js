@@ -285,4 +285,16 @@ document.addEventListener("DOMContentLoaded", () => {
       plugins: [],
     });
   }
+
+  // Toggle for expenses graph
+  const toggleGraphBtn = document.getElementById("toggle-expenses-graph");
+  const barGraphCanvas = document.getElementById("category-bar-graph");
+  let graphVisible = false;
+  toggleGraphBtn.addEventListener("click", () => {
+    graphVisible = !graphVisible;
+    barGraphCanvas.style.display = graphVisible ? "block" : "none";
+    toggleGraphBtn.textContent = graphVisible
+      ? "Hide Expenses Graph"
+      : "Show Expenses Graph";
+  });
 });

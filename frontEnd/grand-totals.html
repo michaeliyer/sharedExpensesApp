@@ -19,9 +19,16 @@
     <div class="container">
       <div class="table-container">
         <h2>Annual Total: <span id="annual-total-amount"></span></h2>
+        <button
+          id="toggle-expenses-graph"
+          class="category-expand-btn"
+          style="margin-bottom: 16px"
+        >
+          Show Expenses Graph
+        </button>
         <canvas
           id="category-bar-graph"
-          style="max-width: 100%; margin-bottom: 32px"
+          style="max-width: 100%; margin-bottom: 32px; display: none"
         ></canvas>
         <div id="category-totals-container"></div>
       </div>
