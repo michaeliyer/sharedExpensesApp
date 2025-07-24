@@ -257,6 +257,17 @@ router.get("/ytd-totals/:month", async (req, res) => {
   }
 });
 
+router.get("/total-deposits", async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT COALESCE(SUM(amount), 0) AS totalDeposits FROM expenses WHERE type = 'deposit'`
+    );
+    res.json(rows[0]);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 router.delete("/category/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -265,12 +276,10 @@ router.delete("/category/:id", async (req, res) => {
       [id]
     );
     if (expenses.rows.length > 0) {
-      return res
-        .status(400)
-        .json({
-          error:
-            "Category is not empty and cannot be deleted. Please Clear Data!",
-        });
+      return res.status(400).json({
+        error:
+          "Category is not empty and cannot be deleted. Please Clear Data!",
+      });
     }
     await pool.query(`DELETE FROM categories WHERE id = $1`, [id]);
     res.json({ success: true });

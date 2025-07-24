@@ -41,13 +41,24 @@ document.addEventListener("DOMContentLoaded", () => {
           categoryDiv.innerHTML = `
                         <h4>${category.categoryname || "Uncategorized"}</h4>
                         <p>Expenses: $${category.totalexpenses.toFixed(2)}</p>
-                        <p>Deposits: $${category.totaldeposits.toFixed(2)}</p>
                         <p>Net: $${net.toFixed(2)}</p>
                     `;
           categoryTotalsContainer.appendChild(categoryDiv);
         });
         annualTotalAmount.textContent = `$${totalNet.toFixed(2)}`;
       }
+      // Fetch and display total deposits in a dedicated section
+      fetchWithAuth("/api/total-deposits")
+        .then((response) => response.json())
+        .then((depositData) => {
+          const depositSection = document.createElement("div");
+          depositSection.classList.add("category-item");
+          depositSection.innerHTML = `
+            <h3>All Deposits</h3>
+            <p>Total Deposits: $${(+depositData.totaldeposits).toFixed(2)}</p>
+          `;
+          categoryTotalsContainer.appendChild(depositSection);
+        });
     })
     .catch((error) => console.error("Error fetching grand totals:", error));
 });
