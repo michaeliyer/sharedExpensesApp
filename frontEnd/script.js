@@ -112,8 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((response) => response.json())
       .then((names) => {
         nameSelect.innerHTML = '<option value="">Select Name</option>';
-        searchNameSelect.innerHTML =
-          '<option value="Search by Name">Search by Name</option>';
+        searchNameSelect.innerHTML = '<option value="">Name/Business</option>';
         names.forEach((name) => {
           if (name.name !== "Deposit") {
             const option = document.createElement("option");
