@@ -28,13 +28,13 @@ document.addEventListener("DOMContentLoaded", () => {
       return response.json();
     })
     .then((data) => {
-      let totalNet = 0;
+      let totalExpenses = 0;
       if (data.length === 0) {
         annualTotalAmount.textContent = "$0.00";
       } else {
         data.forEach((category) => {
+          totalExpenses += category.totalexpenses;
           const net = category.totalexpenses - category.totaldeposits;
-          totalNet += net;
 
           const categoryDiv = document.createElement("div");
           categoryDiv.classList.add("category-item");
@@ -45,19 +45,23 @@ document.addEventListener("DOMContentLoaded", () => {
                     `;
           categoryTotalsContainer.appendChild(categoryDiv);
         });
-        annualTotalAmount.textContent = `$${totalNet.toFixed(2)}`;
       }
-      // Fetch and display total deposits in a dedicated section
+      // Fetch and display total deposits in a dedicated section, and update annual total
       fetchWithAuth("/api/total-deposits")
         .then((response) => response.json())
         .then((depositData) => {
+          const totalDeposits = +depositData.totaldeposits;
           const depositSection = document.createElement("div");
           depositSection.classList.add("category-item");
           depositSection.innerHTML = `
             <h3>All Deposits</h3>
-            <p>Total Deposits: $${(+depositData.totaldeposits).toFixed(2)}</p>
+            <p>Total Deposits: $${totalDeposits.toFixed(2)}</p>
           `;
           categoryTotalsContainer.appendChild(depositSection);
+          // Update annual total
+          annualTotalAmount.textContent = `$${(
+            totalExpenses - totalDeposits
+          ).toFixed(2)}`;
         });
     })
     .catch((error) => console.error("Error fetching grand totals:", error));
