@@ -476,4 +476,20 @@ document.addEventListener("DOMContentLoaded", () => {
       loadModalCategories();
     }
   });
+
+  // Toggle Search and Filter panel
+  const toggleSearchBtn = document.getElementById("toggle-search-btn");
+  const searchToggleGroup = document.getElementById("search-toggle-group");
+  if (toggleSearchBtn && searchToggleGroup) {
+    toggleSearchBtn.addEventListener("click", () => {
+      if (
+        searchToggleGroup.style.display === "none" ||
+        searchToggleGroup.style.display === ""
+      ) {
+        searchToggleGroup.style.display = "block";
+      } else {
+        searchToggleGroup.style.display = "none";
+      }
+    });
+  }
 });
