@@ -252,10 +252,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const categoryId = searchCategorySelect.value;
     const type = document.getElementById("search-type").value;
 
-    if (name) query.append("name", name);
-    if (month) query.append("month", month);
-    if (startDate) query.append("startDate", startDate);
-    if (endDate) query.append("endDate", endDate);
+    // Only add name if a real name is selected
+    if (name && name !== "" && name !== "Search by Name")
+      query.append("name", name);
+
+    // Only send one date filter at a time
+    if (month) {
+      query.append("month", month);
+    } else if (startDate && endDate) {
+      query.append("startDate", startDate);
+      query.append("endDate", endDate);
+    }
+
     if (categoryId) query.append("category_id", categoryId);
     if (type) query.append("type", type);
 
