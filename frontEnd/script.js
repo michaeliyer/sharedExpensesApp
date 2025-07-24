@@ -254,7 +254,23 @@ document.addEventListener("DOMContentLoaded", () => {
     searchFormEl.appendChild(resetBtn);
   }
   resetBtn.onclick = () => {
+    // Reset all fields
     searchNameSelect.value = "";
+    // Ensure placeholder is present and correct
+    searchNameSelect.innerHTML = '<option value="">Name/Business</option>';
+    // Re-add names except Deposit
+    fetchWithAuth("/api/names")
+      .then((response) => response.json())
+      .then((names) => {
+        names.forEach((name) => {
+          if (name.name !== "Deposit") {
+            const option = document.createElement("option");
+            option.value = name.name;
+            option.textContent = name.name;
+            searchNameSelect.appendChild(option);
+          }
+        });
+      });
     document.getElementById("search-month").value = "";
     document.getElementById("search-start-date").value = "";
     document.getElementById("search-end-date").value = "";
