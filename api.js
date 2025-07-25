@@ -89,10 +89,17 @@ router.get("/entries", async (req, res) => {
       queryParams.push(`%${req.query.name}%`);
     }
     if (req.query.month) {
+      // Use BETWEEN for first and last day of the month
+      const [year, month] = req.query.month.split("-");
+      const startDate = `${year}-${month}-01`;
+      // Get last day of month
+      const endDate = new Date(year, month, 0).toISOString().slice(0, 10);
       whereClauses.push(
-        `TO_CHAR(e.date, 'YYYY-MM') = $${queryParams.length + 1}`
+        `e.date BETWEEN $${queryParams.length + 1} AND $${
+          queryParams.length + 2
+        }`
       );
-      queryParams.push(req.query.month);
+      queryParams.push(startDate, endDate);
     }
     if (req.query.startDate && req.query.endDate) {
       whereClauses.push(

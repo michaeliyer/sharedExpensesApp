@@ -492,4 +492,147 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  // Print Results functionality
+  const printBtn = document.getElementById("print-results-btn");
+  if (printBtn) {
+    printBtn.addEventListener("click", () => {
+      const resultsContainer = document.getElementById(
+        "search-results-container"
+      );
+      if (!resultsContainer) return;
+      // Clone the results table and label
+      const label = document.getElementById("search-results-label");
+      const table = document.getElementById("search-results-table");
+      const printWindow = window.open("", "", "width=900,height=700");
+      printWindow.document.write("<html><head><title>Print Results</title>");
+      printWindow.document.write(
+        "<style>body{font-family:sans-serif;} table{border-collapse:collapse;width:100%;margin-top:20px;} th,td{border:1px solid #ccc;padding:8px;text-align:left;} th{background:#e9ecef;} h2{margin-bottom:0;} .label{margin-bottom:10px;font-weight:bold;}</style>"
+      );
+      printWindow.document.write("</head><body>");
+      printWindow.document.write("<h2>Search Results</h2>");
+      if (label && label.textContent) {
+        printWindow.document.write(
+          `<div class="label">${label.textContent}</div>`
+        );
+      }
+      printWindow.document.write(table.outerHTML);
+      printWindow.document.write("</body></html>");
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    });
+  }
+
+  // Export Displayed Results as CSV functionality
+  const exportDisplayedBtn = document.getElementById(
+    "export-displayed-csv-btn"
+  );
+  if (exportDisplayedBtn) {
+    exportDisplayedBtn.addEventListener("click", () => {
+      const table = document.getElementById("search-results-table");
+      const rows = Array.from(table.querySelectorAll("tr"));
+      if (rows.length < 2) return alert("No results to export.");
+      // Extract headers
+      const headers = Array.from(rows[0].querySelectorAll("th")).map((th) =>
+        th.textContent.trim()
+      );
+      // Extract data rows
+      const data = rows
+        .slice(1)
+        .map((row) =>
+          Array.from(row.querySelectorAll("td")).map((td) =>
+            td.textContent.trim()
+          )
+        );
+      // Build CSV
+      const csvRows = [headers.join(",")];
+      data.forEach((row) => {
+        csvRows.push(
+          row.map((val) => `"${val.replace(/"/g, '""')}"`).join(",")
+        );
+      });
+      const csvString = csvRows.join("\n");
+      const blob = new Blob([csvString], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      // Prompt for filename
+      let filename = prompt("Enter filename for CSV:", "export.csv");
+      if (!filename) filename = "export.csv";
+      if (!filename.endsWith(".csv")) filename += ".csv";
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  // Print All functionality
+  const printAllBtn = document.getElementById("print-all-btn");
+  if (printAllBtn) {
+    printAllBtn.addEventListener("click", () => {
+      const table = document.getElementById("entries-table");
+      const printWindow = window.open("", "", "width=900,height=700");
+      printWindow.document.write(
+        "<html><head><title>Print All Entries</title>"
+      );
+      printWindow.document.write(
+        "<style>body{font-family:sans-serif;} table{border-collapse:collapse;width:100%;margin-top:20px;} th,td{border:1px solid #ccc;padding:8px;text-align:left;} th{background:#e9ecef;} h2{margin-bottom:0;}</style>"
+      );
+      printWindow.document.write("</head><body>");
+      printWindow.document.write("<h2>All Entries</h2>");
+      printWindow.document.write(table.outerHTML);
+      printWindow.document.write("</body></html>");
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    });
+  }
+
+  // Export All as CSV functionality
+  const exportAllBtn = document.getElementById("export-all-csv-btn");
+  if (exportAllBtn) {
+    exportAllBtn.addEventListener("click", () => {
+      const table = document.getElementById("entries-table");
+      const rows = Array.from(table.querySelectorAll("tr"));
+      if (rows.length < 2) return alert("No entries to export.");
+      // Extract headers
+      const headers = Array.from(rows[0].querySelectorAll("th")).map((th) =>
+        th.textContent.trim()
+      );
+      // Extract data rows
+      const data = rows
+        .slice(1)
+        .map((row) =>
+          Array.from(row.querySelectorAll("td")).map((td) =>
+            td.textContent.trim()
+          )
+        );
+      // Build CSV
+      const csvRows = [headers.join(",")];
+      data.forEach((row) => {
+        csvRows.push(
+          row.map((val) => `"${val.replace(/"/g, '""')}"`).join(",")
+        );
+      });
+      const csvString = csvRows.join("\n");
+      const blob = new Blob([csvString], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      // Prompt for filename
+      let filename = prompt("Enter filename for CSV:", "all-entries.csv");
+      if (!filename) filename = "all-entries.csv";
+      if (!filename.endsWith(".csv")) filename += ".csv";
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
 });
