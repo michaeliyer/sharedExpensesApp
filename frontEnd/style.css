@@ -407,3 +407,20 @@ nav a:hover {
   margin-top: 16px;
   align-self: flex-end;
 }
+
+.deposit-row td,
+.deposit-cell {
+  color: #2e7d32 !important;
+  font-weight: bold;
+  background: #e8f5e9;
+}
+
+/* Optional: legend styling */
+#table-legend {
+  margin-top: 8px;
+  font-size: 0.95em;
+}
+#table-legend .deposit-legend {
+  color: #2e7d32;
+  font-weight: bold;
+}

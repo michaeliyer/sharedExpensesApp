@@ -85,6 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return response;
   }
 
+  // Update loadEntries to style deposit rows and show minus sign
   function loadEntries() {
     fetchWithAuth("/api/entries")
       .then((response) => response.json())
@@ -92,9 +93,12 @@ document.addEventListener("DOMContentLoaded", () => {
         entriesTable.innerHTML = "";
         data.forEach((entry) => {
           const row = entriesTable.insertRow();
+          if (entry.type === "deposit") row.classList.add("deposit-row");
           row.innerHTML = `
             <td>${entry.name}</td>
-            <td>$${entry.amount.toFixed(2)}</td>
+            <td class="${entry.type === "deposit" ? "deposit-cell" : ""}">${
+            entry.type === "deposit" ? "-" : ""
+          }$${(+entry.amount).toFixed(2)}</td>
             <td>${entry.type}</td>
             <td>${entry.categoryname}</td>
             <td>${new Date(entry.date).toLocaleDateString()}</td>
@@ -293,6 +297,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
+  // Update search results rendering to style deposit rows and show minus sign
   searchForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const query = new URLSearchParams();
@@ -304,7 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const type = document.getElementById("search-type").value;
 
     // Only add name if a real name is selected
-    if (name && name !== "" && name !== "Search by Name")
+    if (name && name !== "" && name !== "Name/Business")
       query.append("name", name);
 
     // Only send one date filter at a time
@@ -322,7 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Build filter label
     let label = "Filters: ";
     let any = false;
-    if (name && name !== "" && name !== "Search by Name") {
+    if (name && name !== "" && name !== "Name/Business") {
       label += `Name: ${name} `;
       any = true;
     }
@@ -351,14 +356,17 @@ document.addEventListener("DOMContentLoaded", () => {
         searchResultsTable.innerHTML = "";
         data.forEach((entry) => {
           const row = searchResultsTable.insertRow();
+          if (entry.type === "deposit") row.classList.add("deposit-row");
           row.innerHTML = `
-              <td>${entry.name}</td>
-              <td>$${entry.amount.toFixed(2)}</td>
-              <td>${entry.type}</td>
-              <td>${entry.categoryname}</td>
-              <td>${new Date(entry.date).toLocaleDateString()}</td>
-              <td>${entry.description}</td>
-            `;
+            <td>${entry.name}</td>
+            <td class="${entry.type === "deposit" ? "deposit-cell" : ""}">${
+            entry.type === "deposit" ? "-" : ""
+          }$${(+entry.amount).toFixed(2)}</td>
+            <td>${entry.type}</td>
+            <td>${entry.categoryname}</td>
+            <td>${new Date(entry.date).toLocaleDateString()}</td>
+            <td>${entry.description}</td>
+          `;
         });
         searchResultsContainer.style.display = "block";
       });
@@ -633,6 +641,112 @@ document.addEventListener("DOMContentLoaded", () => {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    });
+  }
+
+  // Show/Hide Total functionality for search results
+  const showTotalBtn = document.getElementById("show-total-btn");
+  const searchTotalDisplay = document.getElementById("search-total-display");
+  let searchTotalVisible = false;
+  if (showTotalBtn && searchTotalDisplay) {
+    showTotalBtn.addEventListener("click", () => {
+      if (!searchTotalVisible) {
+        const table = document.getElementById("search-results-table");
+        const rows = Array.from(table.querySelectorAll("tbody tr"));
+        if (!rows.length) {
+          searchTotalDisplay.textContent = "No results to total.";
+          searchTotalVisible = true;
+          showTotalBtn.textContent = "Hide Total";
+          return;
+        }
+        // Find the Amount and Type column indices
+        const headers = Array.from(table.querySelectorAll("thead th"));
+        const amountIdx = headers.findIndex(
+          (th) => th.textContent.trim().toLowerCase() === "amount"
+        );
+        const typeIdx = headers.findIndex(
+          (th) => th.textContent.trim().toLowerCase() === "type"
+        );
+        if (amountIdx === -1 || typeIdx === -1) {
+          searchTotalDisplay.textContent = "Amount or Type column not found.";
+          searchTotalVisible = true;
+          showTotalBtn.textContent = "Hide Total";
+          return;
+        }
+        let total = 0;
+        rows.forEach((row) => {
+          const cell = row.querySelectorAll("td")[amountIdx];
+          const typeCell = row.querySelectorAll("td")[typeIdx];
+          if (cell && typeCell) {
+            // Always treat value as positive
+            const val = Math.abs(
+              parseFloat(cell.textContent.replace(/[^\d.-]/g, ""))
+            );
+            const type = typeCell.textContent.trim().toLowerCase();
+            if (!isNaN(val)) total += type === "deposit" ? -val : val;
+          }
+        });
+        searchTotalDisplay.textContent = `Total Amount: $${total.toFixed(2)}`;
+        searchTotalVisible = true;
+        showTotalBtn.textContent = "Hide Total";
+      } else {
+        searchTotalDisplay.textContent = "";
+        searchTotalVisible = false;
+        showTotalBtn.textContent = "Show Total";
+      }
+    });
+  }
+
+  // Show/Hide Total functionality for All Entries
+  const showAllTotalBtn = document.getElementById("show-all-total-btn");
+  const allTotalDisplay = document.getElementById("all-total-display");
+  let allTotalVisible = false;
+  if (showAllTotalBtn && allTotalDisplay) {
+    showAllTotalBtn.addEventListener("click", () => {
+      if (!allTotalVisible) {
+        const table = document.getElementById("entries-table");
+        const rows = Array.from(table.querySelectorAll("tbody tr"));
+        if (!rows.length) {
+          allTotalDisplay.textContent = "No entries to total.";
+          allTotalVisible = true;
+          showAllTotalBtn.textContent = "Hide Total";
+          return;
+        }
+        // Find the Amount and Type column indices
+        const headers = Array.from(table.querySelectorAll("thead th"));
+        const amountIdx = headers.findIndex(
+          (th) => th.textContent.trim().toLowerCase() === "amount"
+        );
+        const typeIdx = headers.findIndex(
+          (th) => th.textContent.trim().toLowerCase() === "type"
+        );
+        if (amountIdx === -1 || typeIdx === -1) {
+          allTotalDisplay.textContent = "Amount or Type column not found.";
+          allTotalVisible = true;
+          showAllTotalBtn.textContent = "Hide Total";
+          return;
+        }
+        let total = 0;
+        rows.forEach((row) => {
+          const cell = row.querySelectorAll("td")[amountIdx];
+          const typeCell = row.querySelectorAll("td")[typeIdx];
+          if (cell && typeCell) {
+            // Always treat value as positive
+            const val = Math.abs(
+              parseFloat(cell.textContent.replace(/[^\d.-]/g, ""))
+            );
+            const type = typeCell.textContent.trim().toLowerCase();
+            if (!isNaN(val)) total += type === "deposit" ? -val : val;
+          }
+        });
+        allTotalDisplay.textContent = `Total Amount: $${total.toFixed(2)}`;
+        allTotalVisible = true;
+        showAllTotalBtn.textContent = "Hide Total";
+      } else {
+        allTotalDisplay.textContent = "";
+        allTotalVisible = false;
+        showAllTotalBtn.textContent = "Show Total";
+      }
     });
   }
 });
