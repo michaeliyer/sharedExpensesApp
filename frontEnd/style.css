@@ -359,3 +359,51 @@ nav a:hover {
 .modal-category-cancel:hover {
   background: #495057;
 }
+
+/* Grand Totals Grid Layout */
+#category-totals-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.category-item {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(10, 147, 150, 0.1),
+    0 1.5px 4px rgba(0, 0, 0, 0.04);
+  border: 1.5px solid #e0e0e0;
+  padding: 28px 22px 22px 22px;
+  transition: box-shadow 0.3s, border-color 0.3s, transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.category-item:hover {
+  box-shadow: 0 8px 32px rgba(10, 147, 150, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-color: #0a9396;
+  transform: translateY(-2px) scale(1.02);
+}
+
+.category-item h4,
+.category-item h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #005f73;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.category-item p {
+  margin: 4px 0 0 0;
+  color: #333;
+  font-size: 1em;
+}
+
+.category-expand-btn {
+  margin-top: 16px;
+  align-self: flex-end;
+}
