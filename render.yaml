@@ -7,7 +7,7 @@ services:
     # Use Render's free instance type
     plan: free
     # Commands to build and start the application
-    buildCommand: "npm install"
+    buildCommand: "npm install && npm run build"
     startCommand: "node server.js"
     # Environment variables required by the application
     envVars:

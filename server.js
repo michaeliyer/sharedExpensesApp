@@ -18,8 +18,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "frontEnd")));
 
-// Force Render deployment - timezone fixes included
-console.log("Server starting with timezone fixes deployed");
+// CRITICAL: This deployment includes backend timezone fixes
+console.log("🚀 SERVER STARTING WITH BACKEND TIMEZONE FIXES DEPLOYED 🚀");
+console.log(
+  "📅 All date processing now handled server-side to prevent timezone issues"
+);
+console.log("🔧 API endpoints will log date processing for debugging");
 
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
