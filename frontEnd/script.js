@@ -102,11 +102,14 @@ document.addEventListener("DOMContentLoaded", () => {
             <td>${entry.name}</td>
             <td class="${entry.type === "deposit" ? "deposit-cell" : ""}">${
             entry.type === "deposit" ? "-" : ""
-          }$${(+entry.amount).toFixed(2)}</td>
+          }${parseFloat(entry.amount).toFixed(2)}</td>
             <td>${entry.type}</td>
+            <td>${entry.description || ""}</td>
             <td>${entry.categoryname}</td>
-            <td>${new Date(entry.date).toLocaleDateString()}</td>
-            <td>${entry.description}</td>
+            <td>${entry.date}</td>
+            <td><button class="delete-btn" data-id="${
+              entry.id
+            }">Delete</button></td>
           `;
         });
       });
@@ -386,11 +389,14 @@ document.addEventListener("DOMContentLoaded", () => {
             <td>${entry.name}</td>
             <td class="${entry.type === "deposit" ? "deposit-cell" : ""}">${
             entry.type === "deposit" ? "-" : ""
-          }$${(+entry.amount).toFixed(2)}</td>
+          }${parseFloat(entry.amount).toFixed(2)}</td>
             <td>${entry.type}</td>
+            <td>${entry.description || ""}</td>
             <td>${entry.categoryname}</td>
-            <td>${new Date(entry.date).toLocaleDateString()}</td>
-            <td>${entry.description}</td>
+            <td>${entry.date}</td>
+            <td><button class="delete-btn" data-id="${
+              entry.id
+            }">Delete</button></td>
           `;
         });
         searchResultsContainer.style.display = "block";
