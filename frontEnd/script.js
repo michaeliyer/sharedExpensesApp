@@ -155,8 +155,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const date = document.getElementById("date").value;
     const description = document.getElementById("description").value;
 
-    // Ensure date is treated as local date to avoid timezone issues
+    // TIMEZONE FIX: Convert date to local timezone to prevent one-day-off issue
+    console.log("Original date from form:", date);
     const localDate = new Date(date + "T00:00:00").toISOString().split("T")[0];
+    console.log("Timezone-fixed date:", localDate);
 
     fetchWithAuth("/api/add", {
       method: "POST",
@@ -185,8 +187,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const date = document.getElementById("deposit-date").value;
     const description = document.getElementById("deposit-description").value;
 
-    // Ensure date is treated as local date to avoid timezone issues
+    // TIMEZONE FIX: Convert date to local timezone to prevent one-day-off issue
+    console.log("Original deposit date from form:", date);
     const localDate = new Date(date + "T00:00:00").toISOString().split("T")[0];
+    console.log("Timezone-fixed deposit date:", localDate);
 
     fetchWithAuth("/api/add", {
       method: "POST",

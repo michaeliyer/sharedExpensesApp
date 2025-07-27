@@ -129,11 +129,13 @@ document.addEventListener("DOMContentLoaded", () => {
     editForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const id = document.getElementById("edit-id").value;
-      // Ensure date is treated as local date to avoid timezone issues
+      // TIMEZONE FIX: Convert date to local timezone to prevent one-day-off issue
       const editDate = document.getElementById("edit-date").value;
+      console.log("Original edit date from form:", editDate);
       const localEditDate = new Date(editDate + "T00:00:00")
         .toISOString()
         .split("T")[0];
+      console.log("Timezone-fixed edit date:", localEditDate);
 
       const data = {
         name: document.getElementById("edit-name").value,
