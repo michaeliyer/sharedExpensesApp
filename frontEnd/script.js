@@ -1,3 +1,7 @@
+// CRITICAL TIMEZONE FIX: Date strings are used directly without any conversion $$
+// This prevents the one-day-off issue by avoiding all timezone conversions
+// Render should deploy this updated JavaScript file
+
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
   if (!token) {
