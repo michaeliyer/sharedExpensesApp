@@ -18,6 +18,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "frontEnd")));
 
+// Force Render deployment - timezone fixes included
+console.log("Server starting with timezone fixes deployed");
+
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
   if (
