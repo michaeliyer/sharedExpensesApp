@@ -1,6 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { Pool } = require("pg");
+const { Pool, types } = require("pg");
+
+// CRITICAL TIMEZONE FIX:
+// Override the pg driver's default date parser.
+// This forces all DATE fields (OID 1082) to be returned as plain strings (YYYY-MM-DD)
+// instead of being converted to a JavaScript Date object. This prevents all timezone issues.
+types.setTypeParser(1082, (val) => val);
 
 // CRITICAL BACKEND TIMEZONE FIX DEPLOYED $$
 console.log("🚀 BACKEND TIMEZONE FIXES ARE NOW ACTIVE 🚀");
