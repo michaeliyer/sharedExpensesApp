@@ -35,7 +35,8 @@ BEGIN
 END
 $$;
 
--- Create expenses table
+-- Create expenses table with timezone-aware default date
+-- TIMEZONE FIX: Use America/New_York timezone to prevent one-day-off issues
 CREATE TABLE IF NOT EXISTS expenses (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
@@ -43,7 +44,7 @@ CREATE TABLE IF NOT EXISTS expenses (
   type TEXT CHECK(type IN ('expense', 'deposit')) NOT NULL,
   description TEXT,
   category_id INTEGER REFERENCES categories(id),
-  date DATE DEFAULT CURRENT_DATE
+  date DATE DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'America/New_York')::date
 );
 
 -- Seed default categories if they don't already exist
