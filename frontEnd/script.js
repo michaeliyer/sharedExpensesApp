@@ -155,16 +155,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const date = document.getElementById("date").value;
     const description = document.getElementById("description").value;
 
-    // TIMEZONE FIX: Explicitly use America/New_York timezone
+    // TIMEZONE FIX: Use direct string approach to avoid any timezone conversion
     console.log("Original date from form:", date);
     let processedDate = date;
     if (date) {
-      // Create date in America/New_York timezone to prevent UTC conversion
-      const [year, month, day] = date.split("-");
-      const nyDate = new Date(year, month - 1, day); // month is 0-indexed
-      // Format as YYYY-MM-DD in local timezone
-      processedDate = nyDate.toLocaleDateString("en-CA"); // en-CA gives YYYY-MM-DD format
-      console.log("Timezone-fixed date (NY):", processedDate);
+      // Keep the date exactly as received - no timezone conversion at all
+      processedDate = date; // Use the date string directly
+      console.log("Using date directly (no conversion):", processedDate);
     }
 
     fetchWithAuth("/api/add", {
@@ -194,16 +191,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const date = document.getElementById("deposit-date").value;
     const description = document.getElementById("deposit-description").value;
 
-    // TIMEZONE FIX: Explicitly use America/New_York timezone
+    // TIMEZONE FIX: Use direct string approach to avoid any timezone conversion
     console.log("Original deposit date from form:", date);
     let processedDate = date;
     if (date) {
-      // Create date in America/New_York timezone to prevent UTC conversion
-      const [year, month, day] = date.split("-");
-      const nyDate = new Date(year, month - 1, day); // month is 0-indexed
-      // Format as YYYY-MM-DD in local timezone
-      processedDate = nyDate.toLocaleDateString("en-CA"); // en-CA gives YYYY-MM-DD format
-      console.log("Timezone-fixed deposit date (NY):", processedDate);
+      // Keep the date exactly as received - no timezone conversion at all
+      processedDate = date; // Use the date string directly
+      console.log(
+        "Using deposit date directly (no conversion):",
+        processedDate
+      );
     }
 
     fetchWithAuth("/api/add", {

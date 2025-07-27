@@ -11,16 +11,13 @@ const pool = new Pool({
 router.post("/add", async (req, res) => {
   const { name, amount, type, description, category_id, date } = req.body;
 
-  // TIMEZONE FIX: Explicitly use America/New_York timezone
+  // TIMEZONE FIX: Use direct string approach to avoid any timezone conversion
   console.log("API received date:", date);
   let processedDate = date;
   if (date) {
-    // Create date in America/New_York timezone to prevent UTC conversion
-    const [year, month, day] = date.split("-");
-    const nyDate = new Date(year, month - 1, day); // month is 0-indexed
-    // Format as YYYY-MM-DD in local timezone
-    processedDate = nyDate.toLocaleDateString("en-CA"); // en-CA gives YYYY-MM-DD format
-    console.log("API processed date (NY timezone):", processedDate);
+    // Keep the date exactly as received - no timezone conversion at all
+    processedDate = date; // Use the date string directly
+    console.log("API using date directly (no conversion):", processedDate);
   }
 
   try {
@@ -256,16 +253,16 @@ router.put("/update-transaction/:id", async (req, res) => {
   const id = req.params.id;
   const { name, amount, type, description, category_id, date } = req.body;
 
-  // TIMEZONE FIX: Explicitly use America/New_York timezone
+  // TIMEZONE FIX: Use direct string approach to avoid any timezone conversion
   console.log("API update received date:", date);
   let processedDate = date;
   if (date) {
-    // Create date in America/New_York timezone to prevent UTC conversion
-    const [year, month, day] = date.split("-");
-    const nyDate = new Date(year, month - 1, day); // month is 0-indexed
-    // Format as YYYY-MM-DD in local timezone
-    processedDate = nyDate.toLocaleDateString("en-CA"); // en-CA gives YYYY-MM-DD format
-    console.log("API update processed date (NY timezone):", processedDate);
+    // Keep the date exactly as received - no timezone conversion at all
+    processedDate = date; // Use the date string directly
+    console.log(
+      "API update using date directly (no conversion):",
+      processedDate
+    );
   }
 
   try {
