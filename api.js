@@ -10,10 +10,21 @@ const pool = new Pool({
 
 router.post("/add", async (req, res) => {
   const { name, amount, type, description, category_id, date } = req.body;
+
+  // BACKEND TIMEZONE FIX: Ensure date is handled as local date
+  console.log("API received date:", date);
+  let processedDate = date;
+  if (date) {
+    // Force the date to be treated as local timezone
+    const localDate = new Date(date + "T00:00:00").toISOString().split("T")[0];
+    processedDate = localDate;
+    console.log("API processed date:", processedDate);
+  }
+
   try {
     const result = await pool.query(
       `INSERT INTO expenses (name, amount, type, description, category_id, date) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-      [name, amount, type, description, category_id, date]
+      [name, amount, type, description, category_id, processedDate]
     );
     res.send({ success: true, id: result.rows[0].id });
   } catch (err) {
@@ -242,10 +253,21 @@ router.delete("/delete-transaction/:id", async (req, res) => {
 router.put("/update-transaction/:id", async (req, res) => {
   const id = req.params.id;
   const { name, amount, type, description, category_id, date } = req.body;
+
+  // BACKEND TIMEZONE FIX: Ensure date is handled as local date
+  console.log("API update received date:", date);
+  let processedDate = date;
+  if (date) {
+    // Force the date to be treated as local timezone
+    const localDate = new Date(date + "T00:00:00").toISOString().split("T")[0];
+    processedDate = localDate;
+    console.log("API update processed date:", processedDate);
+  }
+
   try {
     const result = await pool.query(
       `UPDATE expenses SET name = $1, amount = $2, type = $3, description = $4, category_id = $5, date = $6 WHERE id = $7`,
-      [name, amount, type, description, category_id, date, id]
+      [name, amount, type, description, category_id, processedDate, id]
     );
     res.json({ success: true, changes: result.rowCount });
   } catch (err) {
