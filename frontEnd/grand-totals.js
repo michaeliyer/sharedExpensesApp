@@ -298,3 +298,5 @@ document.addEventListener("DOMContentLoaded", () => {
       : "Show Expenses Graph";
   });
 });
+
+console.log("Monthly Totals are so so so Cool, Man!");

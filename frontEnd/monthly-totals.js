@@ -213,3 +213,5 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 });
+
+console.log("Monthly Totals are so so so Cool, Man!");
