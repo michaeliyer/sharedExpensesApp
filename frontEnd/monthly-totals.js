@@ -129,13 +129,19 @@ document.addEventListener("DOMContentLoaded", () => {
     editForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const id = document.getElementById("edit-id").value;
+      // Ensure date is treated as local date to avoid timezone issues
+      const editDate = document.getElementById("edit-date").value;
+      const localEditDate = new Date(editDate + "T00:00:00")
+        .toISOString()
+        .split("T")[0];
+
       const data = {
         name: document.getElementById("edit-name").value,
         amount: parseFloat(document.getElementById("edit-amount").value),
         type: document.getElementById("edit-type").value,
         description: document.getElementById("edit-description").value,
         category_id: document.getElementById("edit-category").value,
-        date: document.getElementById("edit-date").value,
+        date: localEditDate,
       };
 
       fetchWithAuth(`/api/update-transaction/${id}`, {

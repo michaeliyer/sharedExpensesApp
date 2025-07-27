@@ -155,6 +155,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const date = document.getElementById("date").value;
     const description = document.getElementById("description").value;
 
+    // Ensure date is treated as local date to avoid timezone issues
+    const localDate = new Date(date + "T00:00:00").toISOString().split("T")[0];
+
     fetchWithAuth("/api/add", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -163,7 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
         amount,
         type: "expense",
         category_id,
-        date,
+        date: localDate,
         description,
       }),
     })
@@ -182,6 +185,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const date = document.getElementById("deposit-date").value;
     const description = document.getElementById("deposit-description").value;
 
+    // Ensure date is treated as local date to avoid timezone issues
+    const localDate = new Date(date + "T00:00:00").toISOString().split("T")[0];
+
     fetchWithAuth("/api/add", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -189,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
         name: "Deposit",
         amount,
         type: "deposit",
-        date,
+        date: localDate,
         description,
         category_id: null,
       }),
