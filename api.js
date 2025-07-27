@@ -1,6 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const { Pool } = require("pg");
+
+// CRITICAL BACKEND TIMEZONE FIX DEPLOYED $$
+console.log("🚀 BACKEND TIMEZONE FIXES ARE NOW ACTIVE 🚀");
+console.log("📅 All toISOString() calls have been removed");
+console.log("🔧 Dates are now processed directly without any conversion");
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
