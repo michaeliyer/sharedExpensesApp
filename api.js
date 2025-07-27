@@ -99,7 +99,7 @@ router.get("/entries", async (req, res) => {
         e.type,
         e.description,
         COALESCE(c.name, 'Uncategorized') as categoryname,
-        e.date
+        TO_CHAR(e.date, 'MM/DD/YYYY') as date
       FROM expenses e
       LEFT JOIN categories c ON e.category_id = c.id
     `;
@@ -357,10 +357,10 @@ router.get("/entries-by-category/:categoryName", async (req, res) => {
   try {
     let query, params;
     if (categoryName === "Uncategorized") {
-      query = `SELECT e.* FROM expenses e WHERE e.category_id IS NULL ORDER BY e.date DESC`;
+      query = `SELECT e.*, TO_CHAR(e.date, 'MM/DD/YYYY') as date FROM expenses e WHERE e.category_id IS NULL ORDER BY e.date DESC`;
       params = [];
     } else {
-      query = `SELECT e.* FROM expenses e JOIN categories c ON e.category_id = c.id WHERE c.name = $1 ORDER BY e.date DESC`;
+      query = `SELECT e.*, TO_CHAR(e.date, 'MM/DD/YYYY') as date FROM expenses e JOIN categories c ON e.category_id = c.id WHERE c.name = $1 ORDER BY e.date DESC`;
       params = [categoryName];
     }
     const { rows } = await pool.query(query, params);
@@ -373,7 +373,7 @@ router.get("/entries-by-category/:categoryName", async (req, res) => {
 router.get("/all-deposits", async (req, res) => {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM expenses WHERE type = 'deposit' ORDER BY date DESC`
+      `SELECT id, name, amount, type, description, category_id, TO_CHAR(date, 'MM/DD/YYYY') as date FROM expenses WHERE type = 'deposit' ORDER BY date DESC`
     );
     res.json(rows);
   } catch (err) {
