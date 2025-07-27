@@ -102,10 +102,10 @@ router.get("/entries", async (req, res) => {
       // Use BETWEEN for first and last day of the month
       const [year, month] = req.query.month.split("-");
       const startDate = `${year}-${month}-01`;
-      // Get last day of month - use month+1 for 0-indexed Date constructor
-      const endDate = new Date(year, parseInt(month) + 1, 0)
-        .toISOString()
-        .slice(0, 10);
+      // Get last day of month - use direct calculation to avoid timezone issues
+      const lastDay = new Date(year, parseInt(month), 0).getDate();
+      const endDate = `${year}-${month}-${lastDay}`;
+      console.log("Month filter - startDate:", startDate, "endDate:", endDate);
       whereClauses.push(
         `e.date BETWEEN $${queryParams.length + 1} AND $${
           queryParams.length + 2

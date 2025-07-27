@@ -172,9 +172,8 @@ document.addEventListener("DOMContentLoaded", () => {
           document.getElementById("edit-amount").value = tx.amount;
           document.getElementById("edit-type").value = tx.type;
           document.getElementById("edit-description").value = tx.description;
-          document.getElementById("edit-date").value = new Date(tx.date)
-            .toISOString()
-            .split("T")[0];
+          // TIMEZONE FIX: Use date directly without conversion
+          document.getElementById("edit-date").value = tx.date;
 
           // Populate category dropdown
           fetchWithAuth("/api/categories")
