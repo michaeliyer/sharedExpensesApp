@@ -11,14 +11,16 @@ const pool = new Pool({
 router.post("/add", async (req, res) => {
   const { name, amount, type, description, category_id, date } = req.body;
 
-  // BACKEND TIMEZONE FIX: Ensure date is handled as local date
+  // TIMEZONE FIX: Explicitly use America/New_York timezone
   console.log("API received date:", date);
   let processedDate = date;
   if (date) {
-    // Force the date to be treated as local timezone
-    const localDate = new Date(date + "T00:00:00").toISOString().split("T")[0];
-    processedDate = localDate;
-    console.log("API processed date:", processedDate);
+    // Create date in America/New_York timezone to prevent UTC conversion
+    const [year, month, day] = date.split("-");
+    const nyDate = new Date(year, month - 1, day); // month is 0-indexed
+    // Format as YYYY-MM-DD in local timezone
+    processedDate = nyDate.toLocaleDateString("en-CA"); // en-CA gives YYYY-MM-DD format
+    console.log("API processed date (NY timezone):", processedDate);
   }
 
   try {
@@ -254,14 +256,16 @@ router.put("/update-transaction/:id", async (req, res) => {
   const id = req.params.id;
   const { name, amount, type, description, category_id, date } = req.body;
 
-  // BACKEND TIMEZONE FIX: Ensure date is handled as local date
+  // TIMEZONE FIX: Explicitly use America/New_York timezone
   console.log("API update received date:", date);
   let processedDate = date;
   if (date) {
-    // Force the date to be treated as local timezone
-    const localDate = new Date(date + "T00:00:00").toISOString().split("T")[0];
-    processedDate = localDate;
-    console.log("API update processed date:", processedDate);
+    // Create date in America/New_York timezone to prevent UTC conversion
+    const [year, month, day] = date.split("-");
+    const nyDate = new Date(year, month - 1, day); // month is 0-indexed
+    // Format as YYYY-MM-DD in local timezone
+    processedDate = nyDate.toLocaleDateString("en-CA"); // en-CA gives YYYY-MM-DD format
+    console.log("API update processed date (NY timezone):", processedDate);
   }
 
   try {

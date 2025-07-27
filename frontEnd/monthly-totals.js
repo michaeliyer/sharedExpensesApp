@@ -129,13 +129,18 @@ document.addEventListener("DOMContentLoaded", () => {
     editForm.addEventListener("submit", (e) => {
       e.preventDefault();
       const id = document.getElementById("edit-id").value;
-      // TIMEZONE FIX: Convert date to local timezone to prevent one-day-off issue
+      // TIMEZONE FIX: Explicitly use America/New_York timezone
       const editDate = document.getElementById("edit-date").value;
       console.log("Original edit date from form:", editDate);
-      const localEditDate = new Date(editDate + "T00:00:00")
-        .toISOString()
-        .split("T")[0];
-      console.log("Timezone-fixed edit date:", localEditDate);
+      let processedDate = editDate;
+      if (editDate) {
+        // Create date in America/New_York timezone to prevent UTC conversion
+        const [year, month, day] = editDate.split("-");
+        const nyDate = new Date(year, month - 1, day); // month is 0-indexed
+        // Format as YYYY-MM-DD in local timezone
+        processedDate = nyDate.toLocaleDateString("en-CA"); // en-CA gives YYYY-MM-DD format
+        console.log("Timezone-fixed edit date (NY):", processedDate);
+      }
 
       const data = {
         name: document.getElementById("edit-name").value,
@@ -143,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
         type: document.getElementById("edit-type").value,
         description: document.getElementById("edit-description").value,
         category_id: document.getElementById("edit-category").value,
-        date: localEditDate,
+        date: processedDate,
       };
 
       fetchWithAuth(`/api/update-transaction/${id}`, {
