@@ -386,18 +386,18 @@ document.addEventListener("DOMContentLoaded", () => {
           const row = searchResultsTable.insertRow();
           if (entry.type === "deposit") row.classList.add("deposit-row");
           row.innerHTML = `
-            <td>${entry.name}</td>
+              <td>${entry.name}</td>
             <td class="${entry.type === "deposit" ? "deposit-cell" : ""}">${
             entry.type === "deposit" ? "-" : ""
           }${parseFloat(entry.amount).toFixed(2)}</td>
-            <td>${entry.type}</td>
+              <td>${entry.type}</td>
             <td>${entry.description || ""}</td>
-            <td>${entry.categoryname}</td>
+              <td>${entry.categoryname}</td>
             <td>${entry.date}</td>
             <td><button class="delete-btn" data-id="${
               entry.id
             }">Delete</button></td>
-          `;
+            `;
         });
         searchResultsContainer.style.display = "block";
       });
