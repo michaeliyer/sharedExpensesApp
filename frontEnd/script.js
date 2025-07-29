@@ -196,6 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
         loadNames();
         expenseForm.reset();
         expenseModal.classList.remove("show");
+        showSuccessFeedback("💰 Expense Added Successfully!");
       });
   });
 
@@ -234,6 +235,7 @@ document.addEventListener("DOMContentLoaded", () => {
         loadEntries();
         document.getElementById("deposit-form").reset();
         depositModal.classList.remove("show");
+        showSuccessFeedback("💚 Deposit Added Successfully!");
       });
   });
 
@@ -278,6 +280,7 @@ document.addEventListener("DOMContentLoaded", () => {
         loadCategories();
         document.getElementById("category-form").reset();
         categoryModal.classList.remove("show");
+        showSuccessFeedback("📂 Category Added Successfully!");
       });
   });
 
@@ -786,6 +789,20 @@ document.addEventListener("DOMContentLoaded", () => {
         showAllTotalBtn.textContent = "Show Total";
       }
     });
+  }
+
+  // Visual success feedback function
+  function showSuccessFeedback(message) {
+    const feedback = document.createElement("div");
+    feedback.className = "success-feedback";
+    feedback.textContent = message;
+    document.body.appendChild(feedback);
+
+    setTimeout(() => {
+      if (feedback.parentNode) {
+        feedback.parentNode.removeChild(feedback);
+      }
+    }, 2000);
   }
 });
 

@@ -12,18 +12,57 @@
   </head>
   <body>
     <header>
-      <h1>💰 💲 💰 The Expense Tracker 💰 💲 💰</h1>
-      <nav>
-        <a href="grand-totals.html">View Totals</a>
-        <button id="logout-btn" style="display: none">Logout</button>
-      </nav>
+      <div class="header-content">
+        <h1>💰 💲 💰 The Expense Tracker 💰 💲 💰</h1>
+
+        <div class="header-controls">
+          <div class="action-buttons">
+            <button
+              id="add-expense-btn"
+              class="header-btn"
+              style="display: none"
+            >
+              Add Expense
+            </button>
+            <button
+              id="add-deposit-btn"
+              class="header-btn"
+              style="display: none"
+            >
+              Add Deposit
+            </button>
+            <button id="add-category-btn" class="header-btn">
+              Add Category
+            </button>
+          </div>
+
+          <div class="view-controls">
+            <button
+              id="toggle-search-btn"
+              class="icon-btn"
+              title="Search & Filter"
+            >
+              🔍
+            </button>
+            <label class="toggle-container">
+              <input type="checkbox" id="toggle-entries" />
+              <span class="toggle-label">Show All Entries</span>
+            </label>
+          </div>
+
+          <div class="nav-section">
+            <nav>
+              <a href="grand-totals.html">View Totals</a>
+              <button id="logout-btn" class="logout-btn" style="display: none">
+                Logout
+              </button>
+            </nav>
+          </div>
+        </div>
+      </div>
     </header>
     <main class="container">
-      <div class="button-container">
-        <button id="add-expense-btn" style="display: none">Add Expense</button>
-        <button id="add-deposit-btn" style="display: none">Add Deposit</button>
-        <button id="add-category-btn">Add Category</button>
-      </div>
+      <!-- Remove the old button-container div since buttons are now in header -->
 
       <div id="expense-modal" class="modal">
         <div class="modal-content">
@@ -107,14 +146,6 @@
         </div>
       </div>
 
-      <div class="toggle-container">
-        <label class="switch">
-          <input type="checkbox" id="toggle-entries" />
-          <span class="slider round"></span>
-        </label>
-        <span>Show All Entries</span>
-      </div>
-
       <div id="entries-table-container">
         <h2>All Entries</h2>
         <table id="entries-table">
@@ -147,36 +178,6 @@
       </div>
 
       <div id="search-container">
-        <button
-          id="toggle-search-btn"
-          style="
-            background: none;
-            border: none;
-            cursor: pointer;
-            margin-bottom: 10px;
-            font-size: 1.5em;
-          "
-          aria-label="Show Search and Filter"
-        >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle cx="11" cy="11" r="7" stroke="#0a9396" stroke-width="2" />
-            <line
-              x1="16.4142"
-              y1="16"
-              x2="21"
-              y2="20.5858"
-              stroke="#0a9396"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-          </svg>
-        </button>
         <div id="search-toggle-group" style="display: none">
           <div id="search-filter-panel">
             <h2>Search and Filter</h2>
