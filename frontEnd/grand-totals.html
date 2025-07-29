@@ -3,36 +3,51 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Grand Totals</title>
+    <title>💰 Grand Totals - Expense Tracker</title>
     <link rel="stylesheet" href="style.css" />
     <script src="check-auth.js"></script>
   </head>
   <body>
     <header>
-      <h1>Grand Totals</h1>
-      <nav>
-        <a href="index.html">Enter Expenses</a>
-        <a href="monthly-totals.html">Monthly Totals</a>
-        <button id="logout-btn">Logout</button>
-      </nav>
+      <div class="header-content">
+        <h1>📊 💰 Grand Totals 💰 📊</h1>
+
+        <div class="header-controls">
+          <div class="action-buttons">
+            <button id="toggle-expenses-graph" class="header-btn graph-btn">
+              Show Expenses Graph
+            </button>
+          </div>
+
+          <div class="nav-section">
+            <nav>
+              <a href="index.html">Enter Expenses</a>
+              <a href="monthly-totals.html">Monthly Totals</a>
+              <button id="logout-btn" class="logout-btn">Logout</button>
+            </nav>
+          </div>
+        </div>
+      </div>
     </header>
+
     <div class="container">
-      <div class="table-container">
-        <h2>Annual Total: <span id="annual-total-amount"></span></h2>
-        <button
-          id="toggle-expenses-graph"
-          class="category-expand-btn"
-          style="margin-bottom: 16px"
-        >
-          Show Expenses Graph
-        </button>
-        <canvas
-          id="category-bar-graph"
-          style="max-width: 100%; margin-bottom: 32px; display: none"
-        ></canvas>
-        <div id="category-totals-container"></div>
+      <div class="totals-dashboard">
+        <div class="annual-total-card">
+          <h2 class="annual-total-label">Annual Total</h2>
+          <div class="annual-total-amount" id="annual-total-amount">$0.00</div>
+        </div>
+
+        <div class="chart-container">
+          <canvas
+            id="category-bar-graph"
+            style="max-width: 100%; display: none"
+          ></canvas>
+        </div>
+
+        <div class="categories-grid" id="category-totals-container"></div>
       </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="grand-totals.js"></script>
   </body>
