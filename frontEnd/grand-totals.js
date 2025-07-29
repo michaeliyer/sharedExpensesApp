@@ -31,26 +31,87 @@ document.addEventListener("DOMContentLoaded", () => {
       let totalExpenses = 0;
       let categoryNames = [];
       let categoryExpenses = [];
+
+      // Define colors once for consistent use
+      const categoryColors = [
+        {
+          bg: "#667eea",
+          gradient: "linear-gradient(135deg, #667eea, #764ba2)",
+        },
+        {
+          bg: "#ff6b6b",
+          gradient: "linear-gradient(135deg, #ff6b6b, #ff5252)",
+        },
+        {
+          bg: "#4caf50",
+          gradient: "linear-gradient(135deg, #4caf50, #43a047)",
+        },
+        {
+          bg: "#2196f3",
+          gradient: "linear-gradient(135deg, #2196f3, #1976d2)",
+        },
+        {
+          bg: "#9c27b0",
+          gradient: "linear-gradient(135deg, #9c27b0, #673ab7)",
+        },
+        {
+          bg: "#ff9800",
+          gradient: "linear-gradient(135deg, #ff9800, #f57c00)",
+        },
+        {
+          bg: "#607d8b",
+          gradient: "linear-gradient(135deg, #607d8b, #455a64)",
+        },
+        {
+          bg: "#e91e63",
+          gradient: "linear-gradient(135deg, #e91e63, #c2185b)",
+        },
+      ];
+
       if (data.length === 0) {
         annualTotalAmount.textContent = "$0.00";
       } else {
-        data.forEach((category) => {
+        data.forEach((category, index) => {
           totalExpenses += category.totalexpenses;
           categoryNames.push(category.categoryname || "Uncategorized");
           categoryExpenses.push(category.totalexpenses);
           const net = category.totalexpenses - category.totaldeposits;
 
+          // Use the same index for color that will be used in the graph
+          const categoryColor = categoryColors[index % categoryColors.length];
+
           const categoryDiv = document.createElement("div");
-          categoryDiv.classList.add("category-item");
+          categoryDiv.classList.add("category-card");
+          categoryDiv.style.background = categoryColor.gradient;
           categoryDiv.innerHTML = `
-            <h4>${category.categoryname || "Uncategorized"}</h4>
-            <p>Expenses: $${category.totalexpenses.toFixed(2)}</p>
-            <p>Net: $${net.toFixed(2)}</p>
+            <div class="category-card-header">
+              <h4 class="category-card-title">${
+                category.categoryname || "Uncategorized"
+              }</h4>
+              <div class="category-card-icon">📊</div>
+            </div>
+            <div class="category-card-stats">
+              <div class="stat-item">
+                <span class="stat-label">Expenses</span>
+                <span class="stat-value">$${category.totalexpenses.toFixed(
+                  2
+                )}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Net Total</span>
+                <span class="stat-value">$${net.toFixed(2)}</span>
+              </div>
+            </div>
           `;
           // Add expand button
           const expandBtn = document.createElement("button");
-          expandBtn.className = "category-expand-btn";
-          expandBtn.textContent = "View Entries";
+          expandBtn.className = "category-expand-btn-new";
+          expandBtn.innerHTML = `
+            <span>View Entries</span>
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+            </svg>
+          `;
           expandBtn.onclick = () =>
             openCategoryModal(category.categoryname || "Uncategorized");
           categoryDiv.appendChild(expandBtn);
@@ -61,21 +122,37 @@ document.addEventListener("DOMContentLoaded", () => {
           renderCategoryBarGraph(
             categoryNames,
             categoryExpenses,
-            totalExpenses
+            totalExpenses,
+            categoryColors
           );
         }
       }
       // Always render the deposits box, even if total is zero
       const depositSection = document.createElement("div");
-      depositSection.classList.add("category-item");
+      depositSection.classList.add("category-card", "deposits-card");
+      depositSection.style.background =
+        "linear-gradient(135deg, #4caf50, #43a047)";
       depositSection.innerHTML = `
-        <h3>All Deposits</h3>
-        <p id="total-deposits-amount">Total Deposits: $0.00</p>
+        <div class="category-card-header">
+          <h4 class="category-card-title">All Deposits</h4>
+          <div class="category-card-icon">💰</div>
+        </div>
+        <div class="category-card-stats">
+          <div class="stat-item">
+            <span class="stat-label">Total Deposits</span>
+            <span class="stat-value" id="total-deposits-amount">$0.00</span>
+          </div>
+        </div>
       `;
       // Add expand button for deposits
       const expandBtn = document.createElement("button");
-      expandBtn.className = "category-expand-btn";
-      expandBtn.textContent = "View Deposits";
+      expandBtn.className = "category-expand-btn-new";
+      expandBtn.innerHTML = `
+        <span>View Deposits</span>
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+        </svg>
+      `;
       expandBtn.onclick = () => openDepositsModal();
       depositSection.appendChild(expandBtn);
       categoryTotalsContainer.appendChild(depositSection);
@@ -86,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const totalDeposits = +depositData.totaldeposits;
           document.getElementById(
             "total-deposits-amount"
-          ).textContent = `Total Deposits: $${totalDeposits.toFixed(2)}`;
+          ).textContent = `$${totalDeposits.toFixed(2)}`;
           // Update annual total
           annualTotalAmount.textContent = `$${(
             totalExpenses - totalDeposits
@@ -152,10 +229,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const row = document.createElement("tr");
             row.innerHTML = `
               <td>${entry.name}</td>
-              <td>$${(+entry.amount).toFixed(2)}</td>
+              <td class="amount-cell ${
+                entry.type === "deposit" ? "deposit-amount" : "expense-amount"
+              }">$${(+entry.amount).toFixed(2)}</td>
               <td>${entry.type}</td>
               <td>${entry.description || ""}</td>
-              <td>${new Date(entry.date).toLocaleDateString()}</td>
+              <td>${entry.date}</td>
             `;
             tbody.appendChild(row);
           });
@@ -216,9 +295,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const row = document.createElement("tr");
             row.innerHTML = `
               <td>${entry.name}</td>
-              <td>$${(+entry.amount).toFixed(2)}</td>
+              <td class="amount-cell deposit-amount">$${(+entry.amount).toFixed(
+                2
+              )}</td>
               <td>${entry.description || ""}</td>
-              <td>${new Date(entry.date).toLocaleDateString()}</td>
+              <td>${entry.date}</td>
             `;
             tbody.appendChild(row);
           });
@@ -226,13 +307,17 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  // Chart.js bar graph logic
+  // Enhanced Chart.js bar graph logic with better colors
   let categoryBarChart = null;
-  function renderCategoryBarGraph(names, expenses, total) {
+  function renderCategoryBarGraph(names, expenses, total, categoryColors) {
     const ctx = document.getElementById("category-bar-graph").getContext("2d");
     if (categoryBarChart) {
       categoryBarChart.destroy();
     }
+
+    // Use the same colors as the cards for perfect matching
+    const backgroundColors = categoryColors.map((color) => color.bg);
+
     categoryBarChart = new Chart(ctx, {
       type: "bar",
       data: {
@@ -241,15 +326,26 @@ document.addEventListener("DOMContentLoaded", () => {
           {
             label: "Total Expenses",
             data: expenses,
-            backgroundColor: "#0a9396",
+            backgroundColor: backgroundColors.slice(0, names.length),
             borderRadius: 8,
+            borderWidth: 2,
+            borderColor: backgroundColors
+              .slice(0, names.length)
+              .map((color) => color + "80"),
           },
         ],
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
           tooltip: {
+            backgroundColor: "rgba(255, 255, 255, 0.95)",
+            titleColor: "#333",
+            bodyColor: "#666",
+            borderColor: "#ddd",
+            borderWidth: 1,
+            cornerRadius: 8,
             callbacks: {
               label: function (context) {
                 const value = context.parsed.y;
@@ -259,40 +355,64 @@ document.addEventListener("DOMContentLoaded", () => {
             },
           },
           legend: { display: false },
-          datalabels: {
-            display: true,
-            color: "#333",
-            anchor: "end",
-            align: "top",
-            formatter: function (value, context) {
-              const percent = total > 0 ? (value / total) * 100 : 0;
-              return `$${value.toFixed(2)}\n${percent.toFixed(1)}%`;
-            },
-          },
         },
         scales: {
           x: {
-            title: { display: true, text: "Category" },
-            ticks: { color: "#005f73", font: { weight: "bold" } },
+            title: {
+              display: true,
+              text: "Categories",
+              color: "#667eea",
+              font: { size: 14, weight: "bold" },
+            },
+            ticks: {
+              color: "#333",
+              font: { weight: "600", size: 12 },
+              maxRotation: 45,
+              minRotation: 0,
+            },
+            grid: {
+              display: false,
+            },
           },
           y: {
-            title: { display: true, text: "Total Expenses ($)" },
+            title: {
+              display: true,
+              text: "Total Expenses ($)",
+              color: "#667eea",
+              font: { size: 14, weight: "bold" },
+            },
             beginAtZero: true,
-            ticks: { color: "#005f73", font: { weight: "bold" } },
+            ticks: {
+              color: "#333",
+              font: { weight: "500", size: 11 },
+              callback: function (value) {
+                return "$" + value.toFixed(0);
+              },
+            },
+            grid: {
+              color: "rgba(0, 0, 0, 0.1)",
+            },
           },
         },
+        interaction: {
+          intersect: false,
+          mode: "index",
+        },
+        animation: {
+          duration: 1000,
+          easing: "easeOutQuart",
+        },
       },
-      plugins: [],
     });
   }
 
   // Toggle for expenses graph
   const toggleGraphBtn = document.getElementById("toggle-expenses-graph");
-  const barGraphCanvas = document.getElementById("category-bar-graph");
+  const chartContainer = document.querySelector(".chart-container");
   let graphVisible = false;
   toggleGraphBtn.addEventListener("click", () => {
     graphVisible = !graphVisible;
-    barGraphCanvas.style.display = graphVisible ? "block" : "none";
+    chartContainer.style.display = graphVisible ? "block" : "none";
     toggleGraphBtn.textContent = graphVisible
       ? "Hide Expenses Graph"
       : "Show Expenses Graph";
