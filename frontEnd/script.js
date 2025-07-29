@@ -37,8 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const addCategoryBtn = document.getElementById("add-category-btn");
   const addDepositBtn = document.getElementById("add-deposit-btn");
 
-  const closeBtns = document.querySelectorAll(".close-btn");
-
   addExpenseBtn.addEventListener("click", () => {
     expenseModal.classList.add("show");
   });
@@ -51,12 +49,21 @@ document.addEventListener("DOMContentLoaded", () => {
     depositModal.classList.add("show");
   });
 
-  closeBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      expenseModal.classList.remove("show");
-      categoryModal.classList.remove("show");
-      depositModal.classList.remove("show");
-    });
+  // Close buttons - each one only closes its specific modal
+  const expenseCloseBtn = expenseModal.querySelector(".close-btn");
+  const categoryCloseBtn = categoryModal.querySelector(".close-btn");
+  const depositCloseBtn = depositModal.querySelector(".close-btn");
+
+  expenseCloseBtn.addEventListener("click", () => {
+    expenseModal.classList.remove("show");
+  });
+
+  categoryCloseBtn.addEventListener("click", () => {
+    categoryModal.classList.remove("show");
+  });
+
+  depositCloseBtn.addEventListener("click", () => {
+    depositModal.classList.remove("show");
   });
 
   window.addEventListener("click", (event) => {
