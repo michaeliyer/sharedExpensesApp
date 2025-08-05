@@ -111,9 +111,9 @@ document.addEventListener("DOMContentLoaded", () => {
             entry.type === "deposit" ? "-" : ""
           }${parseFloat(entry.amount).toFixed(2)}</td>
             <td>${entry.type}</td>
-            <td>${entry.description || ""}</td>
             <td>${entry.categoryname}</td>
             <td>${entry.date}</td>
+            <td>${entry.description || ""}</td>
             <td><button class="delete-btn" data-id="${
               entry.id
             }">Delete</button></td>
@@ -401,9 +401,9 @@ document.addEventListener("DOMContentLoaded", () => {
             entry.type === "deposit" ? "-" : ""
           }${parseFloat(entry.amount).toFixed(2)}</td>
               <td>${entry.type}</td>
+            <td>${entry.categoryname}</td>
+              <td>${entry.date}</td>
             <td>${entry.description || ""}</td>
-              <td>${entry.categoryname}</td>
-            <td>${entry.date}</td>
             <td><button class="delete-btn" data-id="${
               entry.id
             }">Delete</button></td>
