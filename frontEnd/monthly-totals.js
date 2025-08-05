@@ -96,17 +96,21 @@ document.addEventListener("DOMContentLoaded", () => {
     transactionTable.addEventListener("click", (e) => {
       if (e.target.classList.contains("delete-btn")) {
         const id = e.target.dataset.id;
+        // First confirmation
         if (confirm("Are you sure you want to delete this transaction?")) {
-          fetchWithAuth(`/api/delete-transaction/${id}`, {
-            method: "DELETE",
-          }).then(() => {
-            const currentMonth = monthDetailsTitle.textContent.replace(
-              "Details for ",
-              ""
-            );
-            displayMonthDetails(currentMonth);
-            if (window.loadNames) window.loadNames();
-          });
+          // Second confirmation
+          if (confirm("Are you REALLY sure??? This cannot be undone!")) {
+            fetchWithAuth(`/api/delete-transaction/${id}`, {
+              method: "DELETE",
+            }).then(() => {
+              const currentMonth = monthDetailsTitle.textContent.replace(
+                "Details for ",
+                ""
+              );
+              displayMonthDetails(currentMonth);
+              if (window.loadNames) window.loadNames();
+            });
+          }
         }
       }
       if (e.target.classList.contains("edit-btn")) {

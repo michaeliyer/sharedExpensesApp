@@ -791,6 +791,69 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Delete functionality with double confirmation for Show All Entries table
+  entriesTable.addEventListener("click", (e) => {
+    if (e.target.classList.contains("delete-btn")) {
+      const entryId = e.target.dataset.id;
+
+      // First confirmation
+      if (confirm("Are you sure you want to delete this entry?")) {
+        // Second confirmation
+        if (confirm("Are you REALLY sure??? This cannot be undone!")) {
+          fetchWithAuth(`/api/delete-transaction/${entryId}`, {
+            method: "DELETE",
+          })
+            .then((response) => {
+              if (response.ok) {
+                loadEntries(); // Refresh the table
+                loadNames(); // Update names dropdown
+                showSuccessFeedback("🗑️ Entry Deleted Successfully!");
+              } else {
+                alert("Error deleting entry. Please try again.");
+              }
+            })
+            .catch((error) => {
+              console.error("Delete error:", error);
+              alert("Error deleting entry. Please try again.");
+            });
+        }
+      }
+    }
+  });
+
+  // Delete functionality with double confirmation for Search Results table
+  searchResultsTable.addEventListener("click", (e) => {
+    if (e.target.classList.contains("delete-btn")) {
+      const entryId = e.target.dataset.id;
+
+      // First confirmation
+      if (confirm("Are you sure you want to delete this entry?")) {
+        // Second confirmation
+        if (confirm("Are you REALLY sure??? This cannot be undone!")) {
+          fetchWithAuth(`/api/delete-transaction/${entryId}`, {
+            method: "DELETE",
+          })
+            .then((response) => {
+              if (response.ok) {
+                // Refresh both tables and names
+                loadEntries();
+                loadNames();
+                // Re-run the search to update search results
+                searchForm.dispatchEvent(new Event("submit"));
+                showSuccessFeedback("🗑️ Entry Deleted Successfully!");
+              } else {
+                alert("Error deleting entry. Please try again.");
+              }
+            })
+            .catch((error) => {
+              console.error("Delete error:", error);
+              alert("Error deleting entry. Please try again.");
+            });
+        }
+      }
+    }
+  });
+
   // Visual success feedback function
   function showSuccessFeedback(message) {
     const feedback = document.createElement("div");
