@@ -51,3 +51,6 @@ CREATE TABLE IF NOT EXISTS expenses (
 INSERT INTO categories (name)
 VALUES ('Shopping'), ('Miscellaneous'), ('Food'), ('Transport')
 ON CONFLICT (name) DO NOTHING;
+
+
+

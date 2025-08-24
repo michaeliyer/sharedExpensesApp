@@ -64,6 +64,53 @@ pool.query(schema, (err) => {
   }
 });
 
+
+
+
+
+
+
+
+
+// async function loadRecurringPayments() {
+//   const res = await fetch("/recurring");
+//   const recurring = await res.json();
+//   const tbody = document.querySelector("#recurringTable tbody");
+//   tbody.innerHTML = "";
+
+//   recurring.forEach(item => {
+//     const row = document.createElement("tr");
+//     row.innerHTML = `
+//       <td>${item.name}</td>
+//       <td>${item.amount.toFixed(2)}</td>
+//       <td>${item.frequency}</td>
+//       <td>${item.start_date}</td>
+//       <td>${item.end_date || ""}</td>
+//       <td>
+//         <button onclick="editRecurring(${item.id})">Edit</button>
+//         <button onclick="deleteRecurring(${item.id})">Delete</button>
+//       </td>
+//     `;
+//     tbody.appendChild(row);
+//   });
+// }
+
+// app.get("/recurring", async (req, res) => {
+//   const { data, error } = await supabase
+//     .from("recurring_payments")
+//     .select("*")
+//     .order("start_date", { ascending: true });
+
+//   if (error) return res.status(400).json({ error: error.message });
+//   res.json(data);
+// });
+
+
+
+
+
+
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
   console.log(`Server running on http://localhost:${PORT}`)

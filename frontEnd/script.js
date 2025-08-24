@@ -607,6 +607,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const url = URL.createObjectURL(blob);
       // Prompt for filename
       let filename = prompt("Enter filename for CSV:", "export.csv");
+      if (filename === null) {
+        URL.revokeObjectURL(url);
+        return; // Cancel export if user clicked Cancel
+      }
       if (!filename) filename = "export.csv";
       if (!filename.endsWith(".csv")) filename += ".csv";
       const a = document.createElement("a");
@@ -673,6 +677,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const url = URL.createObjectURL(blob);
       // Prompt for filename
       let filename = prompt("Enter filename for CSV:", "all-entries.csv");
+      if (filename === null) {
+        URL.revokeObjectURL(url);
+        return; // Cancel export if user clicked Cancel
+      }
       if (!filename) filename = "all-entries.csv";
       if (!filename.endsWith(".csv")) filename += ".csv";
       const a = document.createElement("a");
@@ -870,3 +878,48 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 console.log("Monthly Totals are so so so Cool, Man!");
+
+// document.getElementById("showRecurring").addEventListener("click", () => {
+//   document.getElementById("recurringSection").style.display = "block";
+//   loadRecurringPayments();
+// });
+
+// document.getElementById("recurringForm").addEventListener("submit", async (e) => {
+//   e.preventDefault();
+
+//   const newPayment = {
+//     name: document.getElementById("recurringName").value,
+//     amount: parseFloat(document.getElementById("recurringAmount").value),
+//     frequency: document.getElementById("recurringFrequency").value,
+//     start_date: document.getElementById("recurringStartDate").value,
+//     end_date: document.getElementById("recurringEndDate").value || null
+//   };
+
+//   await fetch("/recurring", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify(newPayment)
+//   });
+
+//   e.target.reset();
+//   loadRecurringPayments();
+// });
+
+// async function loadRecurringPayments() {
+//   const res = await fetch("/recurring");
+//   const payments = await res.json();
+//   const tbody = document.querySelector("#recurringTable tbody");
+//   tbody.innerHTML = "";
+
+//   payments.forEach(p => {
+//     const row = document.createElement("tr");
+//     row.innerHTML = `
+//       <td>${p.name}</td>
+//       <td>${p.amount.toFixed(2)}</td>
+//       <td>${p.frequency}</td>
+//       <td>${p.start_date}</td>
+//       <td>${p.end_date || ""}</td>
+//     `;
+//     tbody.appendChild(row);
+//   });
+// }
