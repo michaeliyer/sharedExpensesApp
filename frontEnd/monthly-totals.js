@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <p>Expenses: $${category.monthlyExpenses.toFixed(2)}</p>
             <p>Deposits: $${category.monthlyDeposits.toFixed(2)}</p>
             <p>Net: $${(
-              category.monthlyExpenses - category.monthlyDeposits
+              category.monthlyDeposits - category.monthlyExpenses
             ).toFixed(2)}</p>
           `;
           monthDetailsContainer.appendChild(categoryDiv);
@@ -213,7 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <p>YTD Expenses: $${(data.ytdexpenses || 0).toFixed(2)}</p>
           <p>YTD Deposits: $${(data.ytddeposits || 0).toFixed(2)}</p>
           <p>YTD Net: $${(
-            (data.ytdexpenses || 0) - (data.ytddeposits || 0)
+            (data.ytddeposits || 0) - (data.ytdexpenses || 0)
           ).toFixed(2)}</p>
         `;
         ytdTotalsContainer.appendChild(ytdDiv);

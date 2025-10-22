@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return response;
   }
 
-  // Update loadEntries to style deposit rows and show minus sign
+  // Update loadEntries to style deposit rows
   function loadEntries() {
     fetchWithAuth("/api/entries")
       .then((response) => response.json())
@@ -107,9 +107,9 @@ document.addEventListener("DOMContentLoaded", () => {
           if (entry.type === "deposit") row.classList.add("deposit-row");
           row.innerHTML = `
             <td>${entry.name}</td>
-            <td class="${entry.type === "deposit" ? "deposit-cell" : ""}">${
-            entry.type === "deposit" ? "-" : ""
-          }${parseFloat(entry.amount).toFixed(2)}</td>
+            <td class="${
+              entry.type === "deposit" ? "deposit-cell" : ""
+            }">$${parseFloat(entry.amount).toFixed(2)}</td>
             <td>${entry.type}</td>
             <td>${entry.categoryname}</td>
             <td>${entry.date}</td>
@@ -335,7 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  // Update search results rendering to style deposit rows and show minus sign
+  // Update search results rendering to style deposit rows
   searchForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const query = new URLSearchParams();
@@ -397,9 +397,9 @@ document.addEventListener("DOMContentLoaded", () => {
           if (entry.type === "deposit") row.classList.add("deposit-row");
           row.innerHTML = `
               <td>${entry.name}</td>
-            <td class="${entry.type === "deposit" ? "deposit-cell" : ""}">${
-            entry.type === "deposit" ? "-" : ""
-          }${parseFloat(entry.amount).toFixed(2)}</td>
+            <td class="${
+              entry.type === "deposit" ? "deposit-cell" : ""
+            }">$${parseFloat(entry.amount).toFixed(2)}</td>
               <td>${entry.type}</td>
             <td>${entry.categoryname}</td>
               <td>${entry.date}</td>
@@ -732,7 +732,7 @@ document.addEventListener("DOMContentLoaded", () => {
               parseFloat(cell.textContent.replace(/[^\d.-]/g, ""))
             );
             const type = typeCell.textContent.trim().toLowerCase();
-            if (!isNaN(val)) total += type === "deposit" ? -val : val;
+            if (!isNaN(val)) total += type === "deposit" ? val : -val;
           }
         });
         searchTotalDisplay.textContent = `Total Amount: $${total.toFixed(2)}`;
@@ -785,7 +785,7 @@ document.addEventListener("DOMContentLoaded", () => {
               parseFloat(cell.textContent.replace(/[^\d.-]/g, ""))
             );
             const type = typeCell.textContent.trim().toLowerCase();
-            if (!isNaN(val)) total += type === "deposit" ? -val : val;
+            if (!isNaN(val)) total += type === "deposit" ? val : -val;
           }
         });
         allTotalDisplay.textContent = `Total Amount: $${total.toFixed(2)}`;

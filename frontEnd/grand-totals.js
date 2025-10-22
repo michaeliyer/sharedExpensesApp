@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
           totalExpenses += category.totalexpenses;
           categoryNames.push(category.categoryname || "Uncategorized");
           categoryExpenses.push(category.totalexpenses);
-          const net = category.totalexpenses - category.totaldeposits;
+          const net = category.totaldeposits - category.totalexpenses;
 
           // Use the same index for color that will be used in the graph
           const categoryColor = categoryColors[index % categoryColors.length];
@@ -166,7 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
           ).textContent = `$${totalDeposits.toFixed(2)}`;
           // Update annual total
           annualTotalAmount.textContent = `$${(
-            totalExpenses - totalDeposits
+            totalDeposits - totalExpenses
           ).toFixed(2)}`;
         });
     })
