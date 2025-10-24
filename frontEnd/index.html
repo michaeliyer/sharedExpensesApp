@@ -146,6 +146,42 @@
         </div>
       </div>
 
+      <!-- Edit Modal -->
+      <div id="edit-modal" class="modal">
+        <div class="modal-content">
+          <span class="close-btn">&times;</span>
+          <h2>Edit Transaction</h2>
+          <form id="edit-form">
+            <input type="hidden" id="edit-id" />
+            <input
+              type="text"
+              id="edit-name"
+              placeholder="Person's Name"
+              required
+            />
+            <input
+              type="number"
+              id="edit-amount"
+              placeholder="Amount"
+              step="0.01"
+              required
+            />
+            <select id="edit-type">
+              <option value="expense">Expense</option>
+              <option value="deposit">Deposit</option>
+            </select>
+            <select id="edit-category" required></select>
+            <input
+              type="text"
+              id="edit-description"
+              placeholder="Description (optional)"
+            />
+            <input type="date" id="edit-date" required />
+            <button type="submit">Update Transaction</button>
+          </form>
+        </div>
+      </div>
+
       <div id="entries-table-container">
         <h2>All Entries</h2>
         <table id="entries-table">

@@ -2,6 +2,9 @@
 // This prevents the one-day-off issue by avoiding all timezone conversions
 // Render should deploy this updated JavaScript file
 
+// 🔐 EDIT PIN: Change the PIN below to control edit access
+// Current PIN: 1234 (change this value to update the edit PIN)
+
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -32,6 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const expenseModal = document.getElementById("expense-modal");
   const categoryModal = document.getElementById("category-modal");
   const depositModal = document.getElementById("deposit-modal");
+  const editModal = document.getElementById("edit-modal");
 
   const addExpenseBtn = document.getElementById("add-expense-btn");
   const addCategoryBtn = document.getElementById("add-category-btn");
@@ -53,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const expenseCloseBtn = expenseModal.querySelector(".close-btn");
   const categoryCloseBtn = categoryModal.querySelector(".close-btn");
   const depositCloseBtn = depositModal.querySelector(".close-btn");
+  const editCloseBtn = editModal.querySelector(".close-btn");
 
   expenseCloseBtn.addEventListener("click", () => {
     expenseModal.classList.remove("show");
@@ -66,15 +71,21 @@ document.addEventListener("DOMContentLoaded", () => {
     depositModal.classList.remove("show");
   });
 
+  editCloseBtn.addEventListener("click", () => {
+    editModal.classList.remove("show");
+  });
+
   window.addEventListener("click", (event) => {
     if (
       event.target == expenseModal ||
       event.target == categoryModal ||
-      event.target == depositModal
+      event.target == depositModal ||
+      event.target == editModal
     ) {
       expenseModal.classList.remove("show");
       categoryModal.classList.remove("show");
       depositModal.classList.remove("show");
+      editModal.classList.remove("show");
     }
   });
 
@@ -114,9 +125,10 @@ document.addEventListener("DOMContentLoaded", () => {
             <td>${entry.categoryname}</td>
             <td>${entry.date}</td>
             <td>${entry.description || ""}</td>
-            <td><button class="delete-btn" data-id="${
-              entry.id
-            }">Delete</button></td>
+            <td>
+              <button class="edit-btn" data-id="${entry.id}">Edit</button>
+              <button class="delete-btn" data-id="${entry.id}">Delete</button>
+            </td>
           `;
         });
       });
@@ -404,9 +416,10 @@ document.addEventListener("DOMContentLoaded", () => {
             <td>${entry.categoryname}</td>
               <td>${entry.date}</td>
             <td>${entry.description || ""}</td>
-            <td><button class="delete-btn" data-id="${
-              entry.id
-            }">Delete</button></td>
+            <td>
+              <button class="edit-btn" data-id="${entry.id}">Edit</button>
+              <button class="delete-btn" data-id="${entry.id}">Delete</button>
+            </td>
             `;
         });
         searchResultsContainer.style.display = "block";
@@ -826,6 +839,9 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
       }
+    } else if (e.target.classList.contains("edit-btn")) {
+      const entryId = e.target.dataset.id;
+      openEditModal(entryId);
     }
   });
 
@@ -859,7 +875,228 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
       }
+    } else if (e.target.classList.contains("edit-btn")) {
+      const entryId = e.target.dataset.id;
+      openEditModal(entryId);
     }
+  });
+
+  // PIN for edit access - easily changeable
+  const EDIT_PIN = "0000";
+
+  // Edit modal functionality
+  function openEditModal(entryId) {
+    // Show PIN prompt modal
+    showPinPrompt(entryId);
+  }
+
+  // PIN prompt modal
+  function showPinPrompt(entryId) {
+    // Create PIN modal overlay
+    const pinOverlay = document.createElement("div");
+    pinOverlay.className = "pin-modal-overlay";
+    pinOverlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    `;
+
+    // Create PIN modal box
+    const pinBox = document.createElement("div");
+    pinBox.style.cssText = `
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    `;
+
+    pinBox.innerHTML = `
+      <h3 style="margin: 0 0 20px 0; color: #005f73;">🔐 Edit Access Required</h3>
+      <p style="margin: 0 0 20px 0; color: #666;">Enter PIN to edit this entry:</p>
+      <input 
+        type="password" 
+        id="pin-input" 
+        placeholder="Enter PIN" 
+        style="
+          width: 100%;
+          padding: 12px;
+          border: 2px solid #ddd;
+          border-radius: 6px;
+          font-size: 16px;
+          text-align: center;
+          margin-bottom: 20px;
+          box-sizing: border-box;
+        "
+        autofocus
+      />
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button 
+          id="pin-cancel" 
+          style="
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+          "
+        >Cancel</button>
+        <button 
+          id="pin-submit" 
+          style="
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+          "
+        >Submit</button>
+      </div>
+    `;
+
+    pinOverlay.appendChild(pinBox);
+    document.body.appendChild(pinOverlay);
+
+    const pinInput = pinBox.querySelector("#pin-input");
+    const pinCancel = pinBox.querySelector("#pin-cancel");
+    const pinSubmit = pinBox.querySelector("#pin-submit");
+
+    // Focus on input
+    pinInput.focus();
+
+    // Handle Enter key
+    pinInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        pinSubmit.click();
+      }
+    });
+
+    // Handle Cancel
+    pinCancel.addEventListener("click", () => {
+      document.body.removeChild(pinOverlay);
+    });
+
+    // Handle Submit
+    pinSubmit.addEventListener("click", () => {
+      const enteredPin = pinInput.value;
+      if (enteredPin === EDIT_PIN) {
+        document.body.removeChild(pinOverlay);
+        proceedWithEdit(entryId);
+      } else {
+        alert("❌ Incorrect PIN. Edit access denied.");
+        pinInput.value = "";
+        pinInput.focus();
+      }
+    });
+
+    // Close on overlay click
+    pinOverlay.addEventListener("click", (e) => {
+      if (e.target === pinOverlay) {
+        document.body.removeChild(pinOverlay);
+      }
+    });
+  }
+
+  // Proceed with edit after PIN verification
+  function proceedWithEdit(entryId) {
+    // Fetch the entry data
+    fetchWithAuth(`/api/entries/${entryId}`)
+      .then((response) => response.json())
+      .then((entry) => {
+        // Populate the edit form
+        document.getElementById("edit-id").value = entry.id;
+        document.getElementById("edit-name").value = entry.name;
+        document.getElementById("edit-amount").value = entry.amount;
+        document.getElementById("edit-type").value = entry.type;
+        document.getElementById("edit-description").value =
+          entry.description || "";
+        document.getElementById("edit-date").value = entry.date;
+
+        // Set category
+        const categorySelect = document.getElementById("edit-category");
+        categorySelect.innerHTML = ""; // Clear existing options
+
+        // Load categories and set the selected one
+        fetchWithAuth("/api/categories")
+          .then((response) => response.json())
+          .then((categories) => {
+            categories.forEach((category) => {
+              const option = document.createElement("option");
+              option.value = category.id;
+              option.textContent = category.name;
+              if (category.id === entry.category_id) {
+                option.selected = true;
+              }
+              categorySelect.appendChild(option);
+            });
+          });
+
+        // Show the modal
+        editModal.classList.add("show");
+      })
+      .catch((error) => {
+        console.error("Error fetching entry:", error);
+        alert("Error loading entry for editing");
+      });
+  }
+
+  // Edit form submission
+  document.getElementById("edit-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const id = document.getElementById("edit-id").value;
+    const name = document.getElementById("edit-name").value;
+    const amount = document.getElementById("edit-amount").value;
+    const type = document.getElementById("edit-type").value;
+    const category_id = document.getElementById("edit-category").value;
+    const description = document.getElementById("edit-description").value;
+    const date = document.getElementById("edit-date").value;
+
+    fetchWithAuth(`/api/update-transaction/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        amount: parseFloat(amount),
+        type,
+        category_id: parseInt(category_id),
+        description,
+        date,
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          editModal.classList.remove("show");
+          loadEntries(); // Refresh the main table
+          loadNames(); // Update names dropdown
+          // Re-run search if search results are visible
+          if (searchResultsContainer.style.display === "block") {
+            searchForm.dispatchEvent(new Event("submit"));
+          }
+          showSuccessFeedback("✏️ Entry Updated Successfully!");
+        } else {
+          alert("Error updating entry. Please try again.");
+        }
+      })
+      .catch((error) => {
+        console.error("Update error:", error);
+        alert("Error updating entry. Please try again.");
+      });
   });
 
   // Visual success feedback function

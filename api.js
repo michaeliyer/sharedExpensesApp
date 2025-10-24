@@ -161,6 +161,33 @@ router.get("/entries", async (req, res) => {
   }
 });
 
+router.get("/entries/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rows } = await pool.query(
+      `SELECT
+        e.id,
+        e.name,
+        e.amount,
+        e.type,
+        e.description,
+        e.category_id,
+        TO_CHAR(e.date, 'YYYY-MM-DD') as date
+      FROM expenses e
+      WHERE e.id = $1`,
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Entry not found" });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 router.get("/totals", async (req, res) => {
   try {
     const { rows } = await pool.query(

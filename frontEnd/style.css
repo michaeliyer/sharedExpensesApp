@@ -1222,6 +1222,25 @@ td:nth-child(3) {
   box-shadow: 0 4px 15px rgba(255, 82, 82, 0.3);
 }
 
+.edit-btn {
+  background: linear-gradient(135deg, #4caf50, #45a049);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  margin-right: 5px;
+  transition: all 0.3s ease;
+}
+
+.edit-btn:hover {
+  background: linear-gradient(135deg, #45a049, #388e3c);
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
 /* Navigation Links Enhancement */
 nav a {
   color: white;
