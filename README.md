@@ -84,31 +84,30 @@ MASTER_USERNAME=your_username
 MASTER_PASSWORD=your_password
 ```
 
-## 🔒 PIN Protection for Editing
+## 🔒 PIN Protection for Editing & Deleting
 
-The app includes PIN protection for all edit operations to prevent unauthorized modifications.
+The app includes PIN protection for all edit and delete operations to prevent unauthorized modifications.
 
 ### Current PIN
 
 - **Default PIN**: `1234`
 
-### How to Change the Edit PIN
+### How to Change the Master PIN
 
-#### Method 1: Main Application (script.js)
+**Single Location Control**: The PIN is controlled from one location for easy management.
 
 1. Open `frontEnd/script.js`
-2. Find line 885: `const EDIT_PIN = "1234";`
-3. Change to your desired PIN: `const EDIT_PIN = "your-new-pin";`
+2. Find line 8: `window.MASTER_PIN = "1234";`
+3. Change to your desired PIN: `window.MASTER_PIN = "your-new-pin";`
 4. Save the file
 
-#### Method 2: Monthly Totals (monthly-totals.js)
+**That's it!** The PIN will automatically update across:
 
-1. Open `frontEnd/monthly-totals.js`
-2. Find line 4: `const EDIT_PIN = "1234";`
-3. Change to your desired PIN: `const EDIT_PIN = "your-new-pin";`
-4. Save the file
+- All edit operations (main view, search results, monthly totals)
+- All delete operations (main view, search results)
+- All admin functions
 
-**Note**: You need to update the PIN in both files to maintain consistency across all edit functions.
+**Note**: The PIN is set as a global variable (`window.MASTER_PIN`) so it's shared across all JavaScript files automatically.
 
 ### PIN Security Features
 

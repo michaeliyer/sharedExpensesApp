@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // 🔐 EDIT PIN: Change the PIN below to control edit access
-  // Current PIN: 0000 (change this value to update the edit PIN)
-  const EDIT_PIN = "0000";
+  // Use the global master PIN from script.js
+  // The PIN is controlled by window.MASTER_PIN in script.js
+  const EDIT_PIN = window.MASTER_PIN || "0000"; // Fallback to 0000 if not set
 
   const monthListContainer = document.getElementById("month-list-container");
   const monthDetailsTitle = document.getElementById("month-details-title");
@@ -100,22 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
     transactionTable.addEventListener("click", (e) => {
       if (e.target.classList.contains("delete-btn")) {
         const id = e.target.dataset.id;
-        // First confirmation
-        if (confirm("Are you sure you want to delete this transaction?")) {
-          // Second confirmation
-          if (confirm("Are you REALLY sure??? This cannot be undone!")) {
-            fetchWithAuth(`/api/delete-transaction/${id}`, {
-              method: "DELETE",
-            }).then(() => {
-              const currentMonth = monthDetailsTitle.textContent.replace(
-                "Details for ",
-                ""
-              );
-              displayMonthDetails(currentMonth);
-              if (window.loadNames) window.loadNames();
-            });
-          }
-        }
+        showDeletePinPrompt(id);
       }
       if (e.target.classList.contains("edit-btn")) {
         const id = e.target.dataset.id;
@@ -277,7 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Handle Submit
       pinSubmit.addEventListener("click", () => {
         const enteredPin = pinInput.value;
-        if (enteredPin === EDIT_PIN) {
+        if (enteredPin === (window.MASTER_PIN || "0000")) {
           document.body.removeChild(pinOverlay);
           proceedWithEdit(entryId);
         } else {
@@ -348,6 +333,146 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
         ytdTotalsContainer.appendChild(ytdDiv);
       });
+  }
+
+  // Delete PIN prompt modal for monthly totals
+  function showDeletePinPrompt(entryId) {
+    // Create PIN modal overlay
+    const pinOverlay = document.createElement("div");
+    pinOverlay.className = "pin-modal-overlay";
+    pinOverlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    `;
+
+    // Create PIN modal box
+    const pinBox = document.createElement("div");
+    pinBox.style.cssText = `
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    `;
+
+    pinBox.innerHTML = `
+      <h3 style="margin: 0 0 20px 0; color: #d32f2f;">🗑️ Delete Access Required</h3>
+      <p style="margin: 0 0 20px 0; color: #666;">Enter PIN to delete this entry:</p>
+      <input 
+        type="password" 
+        id="delete-pin-input" 
+        placeholder="Enter PIN" 
+        style="
+          width: 100%;
+          padding: 12px;
+          border: 2px solid #ddd;
+          border-radius: 6px;
+          font-size: 16px;
+          text-align: center;
+          margin-bottom: 20px;
+          box-sizing: border-box;
+        "
+        autofocus
+      />
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button 
+          id="delete-pin-cancel" 
+          style="
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+          "
+        >Cancel</button>
+        <button 
+          id="delete-pin-submit" 
+          style="
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+          "
+        >Delete</button>
+      </div>
+    `;
+
+    pinOverlay.appendChild(pinBox);
+    document.body.appendChild(pinOverlay);
+
+    const pinInput = pinBox.querySelector("#delete-pin-input");
+    const pinCancel = pinBox.querySelector("#delete-pin-cancel");
+    const pinSubmit = pinBox.querySelector("#delete-pin-submit");
+
+    // Focus on input
+    pinInput.focus();
+
+    // Handle Enter key
+    pinInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        pinSubmit.click();
+      }
+    });
+
+    // Handle Cancel
+    pinCancel.addEventListener("click", () => {
+      document.body.removeChild(pinOverlay);
+    });
+
+    // Handle Submit
+    pinSubmit.addEventListener("click", () => {
+      const enteredPin = pinInput.value;
+      if (enteredPin === (window.MASTER_PIN || "0000")) {
+        document.body.removeChild(pinOverlay);
+        proceedWithDelete(entryId);
+      } else {
+        alert("❌ Incorrect PIN. Delete access denied.");
+        pinInput.value = "";
+        pinInput.focus();
+      }
+    });
+
+    // Close on overlay click
+    pinOverlay.addEventListener("click", (e) => {
+      if (e.target === pinOverlay) {
+        document.body.removeChild(pinOverlay);
+      }
+    });
+  }
+
+  // Proceed with delete after PIN verification
+  function proceedWithDelete(entryId) {
+    // First confirmation
+    if (confirm("Are you sure you want to delete this transaction?")) {
+      // Second confirmation
+      if (confirm("Are you REALLY sure??? This cannot be undone!")) {
+        fetchWithAuth(`/api/delete-transaction/${entryId}`, {
+          method: "DELETE",
+        }).then(() => {
+          const currentMonth = monthDetailsTitle.textContent.replace(
+            "Details for ",
+            ""
+          );
+          displayMonthDetails(currentMonth);
+          if (window.loadNames) window.loadNames();
+        });
+      }
+    }
   }
 });
 

@@ -2,8 +2,10 @@
 // This prevents the one-day-off issue by avoiding all timezone conversions
 // Render should deploy this updated JavaScript file
 
-// 🔐 EDIT PIN: Change the PIN below to control edit access
-// Current PIN: 1234 (change this value to update the edit PIN)
+// 🔐 MASTER PIN: Change the PIN below to control ALL edit and delete access
+// Current PIN: 1234 (change this value to update the PIN for all operations)
+// This PIN controls: editing entries, deleting entries, and all admin functions
+window.MASTER_PIN = "0000";
 
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
@@ -812,77 +814,181 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Delete functionality with double confirmation for Show All Entries table
+  // Delete functionality with PIN protection for Show All Entries table
   entriesTable.addEventListener("click", (e) => {
     if (e.target.classList.contains("delete-btn")) {
       const entryId = e.target.dataset.id;
-
-      // First confirmation
-      if (confirm("Are you sure you want to delete this entry?")) {
-        // Second confirmation
-        if (confirm("Are you REALLY sure??? This cannot be undone!")) {
-          fetchWithAuth(`/api/delete-transaction/${entryId}`, {
-            method: "DELETE",
-          })
-            .then((response) => {
-              if (response.ok) {
-                loadEntries(); // Refresh the table
-                loadNames(); // Update names dropdown
-                showSuccessFeedback("🗑️ Entry Deleted Successfully!");
-              } else {
-                alert("Error deleting entry. Please try again.");
-              }
-            })
-            .catch((error) => {
-              console.error("Delete error:", error);
-              alert("Error deleting entry. Please try again.");
-            });
-        }
-      }
+      showDeletePinPrompt(entryId, "main");
     } else if (e.target.classList.contains("edit-btn")) {
       const entryId = e.target.dataset.id;
       openEditModal(entryId);
     }
   });
 
-  // Delete functionality with double confirmation for Search Results table
+  // Delete functionality with PIN protection for Search Results table
   searchResultsTable.addEventListener("click", (e) => {
     if (e.target.classList.contains("delete-btn")) {
       const entryId = e.target.dataset.id;
-
-      // First confirmation
-      if (confirm("Are you sure you want to delete this entry?")) {
-        // Second confirmation
-        if (confirm("Are you REALLY sure??? This cannot be undone!")) {
-          fetchWithAuth(`/api/delete-transaction/${entryId}`, {
-            method: "DELETE",
-          })
-            .then((response) => {
-              if (response.ok) {
-                // Refresh both tables and names
-                loadEntries();
-                loadNames();
-                // Re-run the search to update search results
-                searchForm.dispatchEvent(new Event("submit"));
-                showSuccessFeedback("🗑️ Entry Deleted Successfully!");
-              } else {
-                alert("Error deleting entry. Please try again.");
-              }
-            })
-            .catch((error) => {
-              console.error("Delete error:", error);
-              alert("Error deleting entry. Please try again.");
-            });
-        }
-      }
+      showDeletePinPrompt(entryId, "search");
     } else if (e.target.classList.contains("edit-btn")) {
       const entryId = e.target.dataset.id;
       openEditModal(entryId);
     }
   });
 
-  // PIN for edit access - easily changeable
-  const EDIT_PIN = "0000";
+  // Use the global master PIN
+  const EDIT_PIN = window.MASTER_PIN;
+
+  // Delete PIN prompt modal
+  function showDeletePinPrompt(entryId, source) {
+    // Create PIN modal overlay
+    const pinOverlay = document.createElement("div");
+    pinOverlay.className = "pin-modal-overlay";
+    pinOverlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    `;
+
+    // Create PIN modal box
+    const pinBox = document.createElement("div");
+    pinBox.style.cssText = `
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    `;
+
+    pinBox.innerHTML = `
+      <h3 style="margin: 0 0 20px 0; color: #d32f2f;">🗑️ Delete Access Required</h3>
+      <p style="margin: 0 0 20px 0; color: #666;">Enter PIN to delete this entry:</p>
+      <input 
+        type="password" 
+        id="delete-pin-input" 
+        placeholder="Enter PIN" 
+        style="
+          width: 100%;
+          padding: 12px;
+          border: 2px solid #ddd;
+          border-radius: 6px;
+          font-size: 16px;
+          text-align: center;
+          margin-bottom: 20px;
+          box-sizing: border-box;
+        "
+        autofocus
+      />
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button 
+          id="delete-pin-cancel" 
+          style="
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+          "
+        >Cancel</button>
+        <button 
+          id="delete-pin-submit" 
+          style="
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+          "
+        >Delete</button>
+      </div>
+    `;
+
+    pinOverlay.appendChild(pinBox);
+    document.body.appendChild(pinOverlay);
+
+    const pinInput = pinBox.querySelector("#delete-pin-input");
+    const pinCancel = pinBox.querySelector("#delete-pin-cancel");
+    const pinSubmit = pinBox.querySelector("#delete-pin-submit");
+
+    // Focus on input
+    pinInput.focus();
+
+    // Handle Enter key
+    pinInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        pinSubmit.click();
+      }
+    });
+
+    // Handle Cancel
+    pinCancel.addEventListener("click", () => {
+      document.body.removeChild(pinOverlay);
+    });
+
+    // Handle Submit
+    pinSubmit.addEventListener("click", () => {
+      const enteredPin = pinInput.value;
+      if (enteredPin === window.MASTER_PIN) {
+        document.body.removeChild(pinOverlay);
+        proceedWithDelete(entryId, source);
+      } else {
+        alert("❌ Incorrect PIN. Delete access denied.");
+        pinInput.value = "";
+        pinInput.focus();
+      }
+    });
+
+    // Close on overlay click
+    pinOverlay.addEventListener("click", (e) => {
+      if (e.target === pinOverlay) {
+        document.body.removeChild(pinOverlay);
+      }
+    });
+  }
+
+  // Proceed with delete after PIN verification
+  function proceedWithDelete(entryId, source) {
+    // First confirmation
+    if (confirm("Are you sure you want to delete this entry?")) {
+      // Second confirmation
+      if (confirm("Are you REALLY sure??? This cannot be undone!")) {
+        fetchWithAuth(`/api/delete-transaction/${entryId}`, {
+          method: "DELETE",
+        })
+          .then((response) => {
+            if (response.ok) {
+              // Refresh tables based on source
+              loadEntries();
+              loadNames();
+              if (source === "search") {
+                // Re-run the search to update search results
+                searchForm.dispatchEvent(new Event("submit"));
+              }
+              showSuccessFeedback("🗑️ Entry Deleted Successfully!");
+            } else {
+              alert("Error deleting entry. Please try again.");
+            }
+          })
+          .catch((error) => {
+            console.error("Delete error:", error);
+            alert("Error deleting entry. Please try again.");
+          });
+      }
+    }
+  }
 
   // Edit modal functionality
   function openEditModal(entryId) {
