@@ -1131,24 +1131,50 @@ document.addEventListener("DOMContentLoaded", () => {
           entry.description || "";
         document.getElementById("edit-date").value = entry.date;
 
-        // Set category
+        // Handle fields based on entry type
+        const typeSelect = document.getElementById("edit-type");
+        const nameInput = document.getElementById("edit-name");
+
+        if (entry.type === "deposit") {
+          typeSelect.disabled = true; // Grey out and disable type selection for deposits
+          nameInput.disabled = true; // Grey out and disable name field for deposits
+        } else {
+          typeSelect.disabled = false; // Enable type selection for expenses
+          nameInput.disabled = false; // Enable name field for expenses
+        }
+
+        // Handle category based on type
         const categorySelect = document.getElementById("edit-category");
         categorySelect.innerHTML = ""; // Clear existing options
 
-        // Load categories and set the selected one
-        fetchWithAuth("/api/categories")
-          .then((response) => response.json())
-          .then((categories) => {
-            categories.forEach((category) => {
-              const option = document.createElement("option");
-              option.value = category.id;
-              option.textContent = category.name;
-              if (category.id === entry.category_id) {
-                option.selected = true;
-              }
-              categorySelect.appendChild(option);
+        if (entry.type === "deposit") {
+          // For deposits, only show "Uncategorized" option
+          const option = document.createElement("option");
+          option.value = ""; // No category for deposits
+          option.textContent = "Uncategorized";
+          option.selected = true;
+          categorySelect.appendChild(option);
+          categorySelect.disabled = true; // Disable the dropdown
+          categorySelect.required = false; // Not required for deposits
+        } else {
+          // For expenses, load all categories
+          categorySelect.disabled = false; // Enable the dropdown
+          categorySelect.required = true; // Required for expenses
+
+          fetchWithAuth("/api/categories")
+            .then((response) => response.json())
+            .then((categories) => {
+              categories.forEach((category) => {
+                const option = document.createElement("option");
+                option.value = category.id;
+                option.textContent = category.name;
+                if (category.id === entry.category_id) {
+                  option.selected = true;
+                }
+                categorySelect.appendChild(option);
+              });
             });
-          });
+        }
 
         // Show the modal
         editModal.classList.add("show");
@@ -1158,6 +1184,43 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("Error loading entry for editing");
       });
   }
+
+  // Handle type change in edit modal (only for expenses)
+  document.getElementById("edit-type").addEventListener("change", (e) => {
+    // Only handle type changes if the field is enabled (not disabled for deposits)
+    if (e.target.disabled) return;
+
+    const type = e.target.value;
+    const categorySelect = document.getElementById("edit-category");
+
+    if (type === "deposit") {
+      // For deposits, only show "Uncategorized" option
+      categorySelect.innerHTML = "";
+      const option = document.createElement("option");
+      option.value = ""; // No category for deposits
+      option.textContent = "Uncategorized";
+      option.selected = true;
+      categorySelect.appendChild(option);
+      categorySelect.disabled = true; // Disable the dropdown
+      categorySelect.required = false; // Not required for deposits
+    } else {
+      // For expenses, load all categories
+      categorySelect.disabled = false; // Enable the dropdown
+      categorySelect.required = true; // Required for expenses
+
+      fetchWithAuth("/api/categories")
+        .then((response) => response.json())
+        .then((categories) => {
+          categorySelect.innerHTML = ""; // Clear existing options
+          categories.forEach((category) => {
+            const option = document.createElement("option");
+            option.value = category.id;
+            option.textContent = category.name;
+            categorySelect.appendChild(option);
+          });
+        });
+    }
+  });
 
   // Edit form submission
   document.getElementById("edit-form").addEventListener("submit", (e) => {
@@ -1171,6 +1234,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const description = document.getElementById("edit-description").value;
     const date = document.getElementById("edit-date").value;
 
+    // For deposits, always set category_id to null
+    const finalCategoryId = type === "deposit" ? null : parseInt(category_id);
+
     fetchWithAuth(`/api/update-transaction/${id}`, {
       method: "PUT",
       headers: {
@@ -1180,7 +1246,7 @@ document.addEventListener("DOMContentLoaded", () => {
         name,
         amount: parseFloat(amount),
         type,
-        category_id: parseInt(category_id),
+        category_id: finalCategoryId,
         description,
         date,
       }),
