@@ -384,6 +384,27 @@ nav a:hover {
   margin-right: 4px;
 }
 
+/* General deposit and expense amount styling for all tables */
+.deposit-amount {
+  color: #4caf50 !important;
+  font-weight: 600;
+}
+
+.deposit-amount::before {
+  content: "💰 ";
+  margin-right: 4px;
+}
+
+.expense-amount {
+  color: #ff5252 !important;
+  font-weight: 600;
+}
+
+.expense-amount::before {
+  content: "💸 ";
+  margin-right: 4px;
+}
+
 .category-expand-btn {
   margin-top: 10px;
   background-color: #0a9396;
