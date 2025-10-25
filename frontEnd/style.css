@@ -1195,6 +1195,16 @@ tr:not(.deposit-row) td:nth-child(2)::before {
   margin-right: 4px;
 }
 
+/* Deposit row styling - override the general rule */
+tr.deposit-row td:nth-child(2) {
+  color: #4caf50 !important;
+}
+
+tr.deposit-row td:nth-child(2)::before {
+  content: "💰 ";
+  margin-right: 4px;
+}
+
 /* Enhanced Type Column */
 td:nth-child(3) {
   font-weight: 600;

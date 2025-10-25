@@ -67,9 +67,14 @@ document.addEventListener("DOMContentLoaded", () => {
             <h4>${category.categoryName || "Uncategorized"}</h4>
             <p>Expenses: $${category.monthlyExpenses.toFixed(2)}</p>
             <p>Deposits: $${category.monthlyDeposits.toFixed(2)}</p>
-            <p>Net: $${(
-              category.monthlyDeposits - category.monthlyExpenses
-            ).toFixed(2)}</p>
+            <p>Net: $${
+              Math.abs(category.monthlyDeposits - category.monthlyExpenses) ===
+              0
+                ? "0.00"
+                : (category.monthlyDeposits - category.monthlyExpenses).toFixed(
+                    2
+                  )
+            }</p>
           `;
           monthDetailsContainer.appendChild(categoryDiv);
         });
@@ -81,9 +86,12 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((data) => {
         data.forEach((tx) => {
           const row = transactionTable.insertRow();
+          if (tx.type === "deposit") row.classList.add("deposit-row");
           row.innerHTML = `
             <td>${tx.name}</td>
-            <td>${tx.amount.toFixed(2)}</td>
+            <td class="${
+              tx.type === "deposit" ? "deposit-cell" : ""
+            }">$${tx.amount.toFixed(2)}</td>
             <td>${tx.type}</td>
             <td>${tx.description}</td>
             <td>${tx.categoryname || "Uncategorized"}</td>
@@ -327,9 +335,11 @@ document.addEventListener("DOMContentLoaded", () => {
         ytdDiv.innerHTML = `
           <p>YTD Expenses: $${(data.ytdexpenses || 0).toFixed(2)}</p>
           <p>YTD Deposits: $${(data.ytddeposits || 0).toFixed(2)}</p>
-          <p>YTD Net: $${(
-            (data.ytddeposits || 0) - (data.ytdexpenses || 0)
-          ).toFixed(2)}</p>
+          <p>YTD Net: $${
+            Math.abs((data.ytddeposits || 0) - (data.ytdexpenses || 0)) === 0
+              ? "0.00"
+              : ((data.ytddeposits || 0) - (data.ytdexpenses || 0)).toFixed(2)
+          }</p>
         `;
         ytdTotalsContainer.appendChild(ytdDiv);
       });
@@ -473,6 +483,139 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+  }
+
+  // Monthly totals button functionality
+  let monthlyTotalVisible = false;
+  const showMonthlyTotalBtn = document.getElementById("show-monthly-total-btn");
+  const monthlyTotalDisplay = document.getElementById("monthly-total-display");
+  const printMonthlyBtn = document.getElementById("print-monthly-btn");
+  const exportMonthlyCsvBtn = document.getElementById("export-monthly-csv-btn");
+
+  // Show/Hide Total functionality
+  if (showMonthlyTotalBtn && monthlyTotalDisplay) {
+    showMonthlyTotalBtn.addEventListener("click", () => {
+      if (!monthlyTotalVisible) {
+        const table = document.getElementById("transaction-table");
+        const rows = Array.from(table.querySelectorAll("tbody tr"));
+        if (!rows.length) {
+          monthlyTotalDisplay.textContent = "No transactions to total.";
+          monthlyTotalVisible = true;
+          showMonthlyTotalBtn.textContent = "Hide Total";
+          return;
+        }
+
+        // Find the Amount and Type column indices
+        const headers = Array.from(table.querySelectorAll("thead th"));
+        const amountIdx = headers.findIndex(
+          (th) => th.textContent.trim().toLowerCase() === "amount"
+        );
+        const typeIdx = headers.findIndex(
+          (th) => th.textContent.trim().toLowerCase() === "type"
+        );
+
+        if (amountIdx === -1 || typeIdx === -1) {
+          monthlyTotalDisplay.textContent = "Amount or Type column not found.";
+          monthlyTotalVisible = true;
+          showMonthlyTotalBtn.textContent = "Hide Total";
+          return;
+        }
+
+        let total = 0;
+        rows.forEach((row) => {
+          const cell = row.querySelectorAll("td")[amountIdx];
+          const typeCell = row.querySelectorAll("td")[typeIdx];
+          if (cell && typeCell) {
+            // Always treat value as positive
+            const val = Math.abs(
+              parseFloat(cell.textContent.replace(/[^\d.-]/g, ""))
+            );
+            const type = typeCell.textContent.trim().toLowerCase();
+            if (!isNaN(val)) total += type === "deposit" ? val : -val;
+          }
+        });
+
+        // Fix -0.00 display issue
+        const displayTotal = total === 0 ? 0 : total;
+        monthlyTotalDisplay.textContent = `Total Amount: $${displayTotal.toFixed(
+          2
+        )}`;
+        monthlyTotalVisible = true;
+        showMonthlyTotalBtn.textContent = "Hide Total";
+      } else {
+        monthlyTotalDisplay.textContent = "";
+        monthlyTotalVisible = false;
+        showMonthlyTotalBtn.textContent = "Show Total";
+      }
+    });
+  }
+
+  // Print functionality
+  if (printMonthlyBtn) {
+    printMonthlyBtn.addEventListener("click", () => {
+      const table = document.getElementById("transaction-table");
+      const printWindow = window.open("", "", "width=900,height=700");
+      printWindow.document.write(
+        "<html><head><title>Print Monthly Transactions</title>"
+      );
+      printWindow.document.write(
+        "<style>table{border-collapse:collapse;width:100%;}th,td{border:1px solid #ddd;padding:8px;text-align:left;}th{background-color:#f2f2f2;}</style>"
+      );
+      printWindow.document.write("</head><body>");
+      printWindow.document.write(
+        `<h2>Monthly Transactions - ${monthDetailsTitle.textContent}</h2>`
+      );
+      printWindow.document.write(table.outerHTML);
+      printWindow.document.write("</body></html>");
+      printWindow.document.close();
+      printWindow.print();
+    });
+  }
+
+  // Export CSV functionality
+  if (exportMonthlyCsvBtn) {
+    exportMonthlyCsvBtn.addEventListener("click", () => {
+      const table = document.getElementById("transaction-table");
+      const rows = Array.from(table.querySelectorAll("tr"));
+      if (rows.length < 2) return alert("No transactions to export.");
+
+      // Extract headers
+      const headers = Array.from(rows[0].querySelectorAll("th")).map((th) =>
+        th.textContent.trim()
+      );
+
+      // Extract data rows
+      const dataRows = Array.from(rows.slice(1)).map((row) =>
+        Array.from(row.querySelectorAll("td")).map((td) => {
+          let text = td.textContent.trim();
+          // Handle amounts - remove $ and ensure proper formatting
+          if (text.includes("$")) {
+            text = text.replace("$", "");
+          }
+          return `"${text}"`;
+        })
+      );
+
+      // Create CSV content
+      const csvContent = [
+        headers.map((h) => `"${h}"`).join(","),
+        ...dataRows.map((row) => row.join(",")),
+      ].join("\n");
+
+      // Create and download file
+      const blob = new Blob([csvContent], { type: "text/csv" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `monthly-transactions-${monthDetailsTitle.textContent.replace(
+        "Details for ",
+        ""
+      )}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    });
   }
 });
 
